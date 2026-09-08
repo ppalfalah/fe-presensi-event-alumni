@@ -40,6 +40,17 @@ self.addEventListener("fetch", (event) => {
   // Skip chrome-extension or other non-http schemes
   if (!event.request.url.startsWith(self.location.origin)) return;
 
+  const url = new URL(event.request.url);
+
+  // Never cache API requests, auth calls, or dynamic backend storage in Service Worker
+  if (
+    url.pathname.startsWith("/api") ||
+    url.pathname.startsWith("/storage") ||
+    url.pathname.startsWith("/_next/webpack-hmr")
+  ) {
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
@@ -71,3 +82,4 @@ self.addEventListener("fetch", (event) => {
     })
   );
 });
+

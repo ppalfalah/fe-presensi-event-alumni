@@ -404,21 +404,10 @@ function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
   // ✅ ADD temp_token if available
   if (tempToken) {
     payload.temp_token = tempToken;
-    console.log('✅ Including temp_token in payload:', tempToken.substring(0, 20) + '...');
-  } else {
-    console.log('📧 No temp_token - regular email registration');
   }
-
-  // 🔍 DEBUG: Show full payload (without password)
-  console.log('📦 Final payload:', {
-    ...payload,
-    password: payload.password ? '***' : undefined,
-    password_confirmation: payload.password_confirmation ? '***' : undefined,
-  });
 
   register(payload, {
     onSuccess: (response) => {
-      console.log('✅ Registration response:', response);
       setSuccessMessage(response.message?.trim() || REGISTER_APPROVAL_MESSAGE);
       setShowSuccessModal(true);
 
@@ -429,9 +418,6 @@ function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
         setTempToken(null);
         setOauthCompleted(false);
       }
-    },
-    onError: (error) => {
-      console.error('❌ Registration error:', error);
     },
   });
 }
@@ -468,9 +454,6 @@ function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
             setTempToken(null); // Clear on error
           }}
           onSuccess={(token, userData) => {
-            console.log("🔑 OAuth callback success!");
-            console.log("Token received:", token.substring(0, 20) + "...");
-
             // ✅ STORE TOKEN
             setTempToken(token);
             setOauthCompleted(true);
@@ -484,10 +467,6 @@ function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
               last_name: userData.last_name || prev.last_name,
               email: userData.email || prev.email,
             }));
-
-            // ⚠️ This will show stale state (expected)
-            // Real check happens in handleSubmit
-            console.log("State will update in next render");
           }}
           disabled={isPending || oauthCompleted}
         />

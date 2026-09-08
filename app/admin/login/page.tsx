@@ -343,7 +343,7 @@ const AdminLogin = () => {
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
                   <svg
-                    xmlns="http://www.w3.org/2050/svg"
+                    xmlns="http://www.w3.org/2000/svg"
                     className="h-4 w-4"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -403,7 +403,7 @@ const AdminLogin = () => {
             {/* Security notice */}
             <div className="p-2.5 bg-[#E8F5E9]/30 rounded-xl border border-[#0D5C3A]/20 text-[#0D5C3A] text-xs flex items-start gap-2">
               <svg
-                xmlns="http://www.w3.org/2050/svg"
+                xmlns="http://www.w3.org/2000/svg"
                 className="h-4 w-4 flex-shrink-0 mt-0.5"
                 fill="none"
                 viewBox="0 0 24 24"

@@ -1,41 +1,132 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sistem Presensi & Event Alumni Al-Falah (Frontend)
 
-## Getting Started
+Aplikasi web modern berbasis **Next.js App Router** untuk pengelolaan presensi, event, segmentasi engagement, dan direktori alumni Pondok Pesantren Al-Falah. Dilengkapi dengan antarmuka PWA (Progressive Web App), integrasi Google OAuth, scanner QR Code kamera langsung, dan dashboard manajemen admin.
 
-First, run the development server:
+---
 
+## 🚀 Tech Stack
+
+- **Framework**: [Next.js 16 (App Router)](https://nextjs.org/) (React 19, TypeScript)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
+- **State & Server Management**: [TanStack Query v5 (React Query)](https://tanstack.com/query/latest)
+- **HTTP Client**: [Axios](https://axios-http.com/)
+- **Icons & UI Utilities**: [Lucide React](https://lucide.dev/)
+- **Charts**: [Chart.js](https://www.chart.js.org/) & [react-chartjs-2](https://react-chartjs-2.js.org/)
+- **QR Code**: [html5-qrcode](https://github.com/mebjas/html5-qrcode) & [qrcode](https://www.npmjs.com/package/qrcode)
+- **PWA**: Service Worker & Web App Manifest
+
+---
+
+## 📋 Prasyarat Sistem
+
+- **Node.js**: Versi `>= 20.x` (Direkomendasikan Node.js 22 LTS)
+- **Package Manager**: `npm` (atau `pnpm` / `yarn`)
+- **Backend API**: Laravel REST API yang sudah berjalan
+
+---
+
+## ⚙️ Panduan Instalasi & Menjalankan Lokal
+
+### 1. Clone Repository
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <URL_REPOSITORY_ANDA>
+cd fe-presensi-event-alumni
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Install Dependencies
+```bash
+npm install
+```
 
-## Developer Notes
+### 3. Konfigurasi Environment Variables
+Salin file `.env.example` menjadi `.env.local`:
+```bash
+cp .env.example .env.local
+```
 
-- Struktur hooks, query, mutation, dan helper reusable dijelaskan di [docs/QUERY_HOOK_STRUCTURE.md](docs/QUERY_HOOK_STRUCTURE.md).
-- Untuk page admin yang logic-nya panjang, gunakan pola `page.tsx` untuk render, `_hooks/use*Page.ts` untuk state/handler, dan `_utils/*` untuk formatter, validator, exporter, atau kalkulasi reusable.
+Sesuaikan variabel di dalam `.env.local`:
+```env
+# Base URL API Laravel Backend
+NEXT_PUBLIC_API_URL=http://127.0.0.1:8000/api
+NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000/api
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+# Host Backend untuk proxy rewrites
+BACKEND_URL=http://127.0.0.1:8000
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Google OAuth Client ID (opsional jika flow redirect ditangani backend)
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+```
 
-## Learn More
+### 4. Jalankan Development Server
+```bash
+npm run dev
+```
+Buka browser di [http://localhost:3000](http://localhost:3000).
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🛠️ Script yang Tersedia
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Script | Deskripsi |
+| --- | --- |
+| `npm run dev` | Menjalankan server development Next.js dengan Webpack bundler |
+| `npm run build` | Membuat production build (standalone output) |
+| `npm run start` | Menjalankan server production Next.js |
+| `npm run lint` | Menjalankan validasi ESLint untuk standarisasi kode |
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📁 Struktur Direktori
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```text
+fe-presensi-event-alumni/
+├── app/                      # Next.js App Router (Halaman & Layouts)
+│   ├── admin/                # Portal & Dashboard Khusus Admin
+│   ├── alumni/               # Portal Alumni (PWA, Dashboard, Scan QR, Riwayat)
+│   ├── components/           # Komponen UI Reusable (Admin & Alumni)
+│   ├── forgot-password/      # Alur reset kata sandi
+│   ├── reset-password/       # Form ubah kata sandi via token email
+│   ├── globals.css           # Styling global Tailwind CSS
+│   ├── layout.tsx            # Root Layout
+│   ├── manifest.ts           # Konfigurasi PWA Manifest
+│   ├── page.tsx              # Landing Page Utama
+│   └── providers.tsx         # TanStack Query & Service Worker Provider
+├── context/                  # React Contexts (e.g. SidebarContext)
+├── docs/                     # Dokumentasi Teknis & Panduan
+│   ├── deployment/           # Panduan Deployment Server & VPS
+│   └── guides/               # Panduan Integrasi Fitur
+├── hooks/                    # Custom Hooks (Admin & Alumni queries/mutations)
+├── lib/                      # Utilitas API, Auth Interceptor, Heartbeat, Types
+├── public/                   # Static Assets, PWA Icons, dan sw.js
+├── next.config.ts            # Konfigurasi Next.js, Rewrites, & Security Headers
+└── package.json
+```
+
+---
+
+## 🔐 Keamanan & Fitur Utama
+
+- **Security Headers Terintegrasi**: Mengaktifkan proteksi `X-Frame-Options` (anti-clickjacking), `X-Content-Type-Options: nosniff`, `Strict-Transport-Security`, `Referrer-Policy`, dan `Permissions-Policy`.
+- **Proteksi Rute Dinamis & Session Heartbeat**: Mekanisme auto-logout otomatis jika sesi kedaluwarsa atau token tidak valid via `lib/heartbeat.ts`.
+- **Service Worker Aman**: Service Worker hanya meng-cache static assets dan secara eksplisit mem-bypass rute `/api/` dan data dinamis user.
+- **PWA & Akses Kamera**: Dukungan penuh Progressive Web App yang dapat di-install di Android & iOS, dengan integrasi scanner QR kamera bawaan.
+
+---
+
+## 📚 Dokumentasi Lanjutan
+
+- [Panduan Deployment Production VPS](docs/deployment/frontend-production.md)
+- [Struktur Hook & Query TanStack](docs/QUERY_HOOK_STRUCTURE.md)
+- [Panduan Integrasi Google OAuth](docs/guides/google-auth.md)
+- [Panduan Otorisasi Admin](docs/guides/admin-authorization.md)
+- [Panduan Integrasi QR Code](docs/guides/qr-integration.md)
+- [Panduan Integrasi Wilayah & Domisili](docs/guides/domicile.md)
+- [Panduan Pemetaan Engagement Alumni](docs/guides/engagement-mapping.md)
+- [Panduan Riwayat Kehadiran](docs/guides/attendance-history.md)
+- [Panduan Auto Logout & Heartbeat](docs/guides/auto-logout.md)
+
+---
+
+## 📄 Lisensi
+
+Hak Cipta © 2026. Seluruh hak cipta dilindungi undang-undang.
