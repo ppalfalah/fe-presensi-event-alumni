@@ -3,32 +3,22 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { startHeartbeat, stopHeartbeat } from "@/lib/heartbeat";
-import { API_BASE_URL } from "@/lib/api";
+import { API_BASE_URL, clearAuthStorage } from "@/lib/api";
+import { SidebarProvider, useSidebar } from "@/context/SidebarContext";
 
 const ADMIN_LOGIN_PATH = "/admin/login";
 const ADMIN_DASHBOARD_PATH = "/admin/dashboard";
 
 function getAdminCredentials() {
   return {
-    // sessionStorage utama, localStorage fallback (migrasi)
-    token: sessionStorage.getItem("access_token") || localStorage.getItem("access_token") || localStorage.getItem("token"),
-    role: sessionStorage.getItem("role") || localStorage.getItem("role"),
+    token: localStorage.getItem("access_token") || sessionStorage.getItem("access_token") || localStorage.getItem("token"),
+    role: localStorage.getItem("role") || sessionStorage.getItem("role"),
   };
 }
 
 function clearAdminCredentials() {
-  // Clear sessionStorage (primary)
-  sessionStorage.removeItem("access_token");
-  sessionStorage.removeItem("role");
-  sessionStorage.removeItem("token_type");
-  sessionStorage.removeItem("user");
-  // Clear localStorage (legacy)
-  localStorage.removeItem("access_token");
-  localStorage.removeItem("token");
-  localStorage.removeItem("role");
+  clearAuthStorage();
 }
-
-import { SidebarProvider, useSidebar } from "@/context/SidebarContext";
 
 function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const { isCollapsed } = useSidebar();
@@ -117,9 +107,10 @@ export default function AdminLayout({
           }
 
           // Simpan data terbaru ke storage
+          localStorage.setItem("user", JSON.stringify(user));
+          localStorage.setItem("role", user.role);
           sessionStorage.setItem("user", JSON.stringify(user));
           sessionStorage.setItem("role", user.role);
-          localStorage.setItem("role", user.role);
         }
       } catch (error) {
         console.error("Gagal melakukan verifikasi profil admin terbaru:", error);

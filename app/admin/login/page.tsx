@@ -92,7 +92,12 @@ const AdminLogin = () => {
         );
       }
 
-      // Simpan di sessionStorage (hilang saat browser ditutup)
+      // Simpan di localStorage & sessionStorage agar persist saat buka tab baru
+      localStorage.setItem("access_token", access_token);
+      localStorage.setItem("token_type", token_type);
+      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("role", user.role);
+
       sessionStorage.setItem("access_token", access_token);
       sessionStorage.setItem("token_type", token_type);
       sessionStorage.setItem("user", JSON.stringify(user));

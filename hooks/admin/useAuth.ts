@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { fetchAPI } from "@/lib/api";
+import { fetchAPI, clearAuthStorage } from "@/lib/api";
 import { startHeartbeat, stopHeartbeat } from "@/lib/heartbeat";
 import type { AdminAuthResponse } from "@/types/auth";
 
@@ -12,11 +12,17 @@ export function useLogin() {
         body: JSON.stringify(credentials),
       }),
     onSuccess: (data) => {
-      sessionStorage.setItem("access_token", data.token);
-      sessionStorage.setItem("role", data.user.role);
-      // Fallback lama jika dibutuhkan
       localStorage.setItem("access_token", data.token);
       localStorage.setItem("role", data.user.role);
+      if (data.user) {
+        localStorage.setItem("user", JSON.stringify(data.user));
+      }
+
+      sessionStorage.setItem("access_token", data.token);
+      sessionStorage.setItem("role", data.user.role);
+      if (data.user) {
+        sessionStorage.setItem("user", JSON.stringify(data.user));
+      }
       
       startHeartbeat();
     },
@@ -30,14 +36,7 @@ export function useLogout() {
       fetchAPI("/logout", { method: "POST" }),
     onSuccess: () => {
       stopHeartbeat();
-      sessionStorage.removeItem("access_token");
-      sessionStorage.removeItem("role");
-      sessionStorage.removeItem("token_type");
-      sessionStorage.removeItem("user");
-      
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("token");
-      localStorage.removeItem("role");
+      clearAuthStorage();
     },
   });
 }

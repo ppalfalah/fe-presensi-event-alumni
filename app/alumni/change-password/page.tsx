@@ -14,7 +14,8 @@ import {
 } from "lucide-react";
 import { FormInput } from "@/app/components/FormControl";
 import { useChangePassword } from "@/hooks/alumni/useChangePassword";
-import { getApiErrorMessage } from "@/lib/api";
+import { getApiErrorMessage, clearAuthStorage } from "@/lib/api";
+import { stopHeartbeat } from "@/lib/heartbeat";
 
 export default function AlumniChangePasswordPage() {
   const router = useRouter();
@@ -68,9 +69,8 @@ export default function AlumniChangePasswordPage() {
 
           // Auto redirect to login after 2 seconds (backend revokes other tokens)
           setTimeout(() => {
-            localStorage.removeItem("alumni_token");
-            localStorage.removeItem("token");
-            localStorage.removeItem("role");
+            stopHeartbeat();
+            clearAuthStorage();
             router.push("/alumni/login");
           }, 2000);
         },

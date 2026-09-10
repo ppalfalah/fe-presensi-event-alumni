@@ -5,6 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { QueryClientProvider } from "@tanstack/react-query";
 import queryClient from "@/lib/queryClient";
 import { startHeartbeat, stopHeartbeat } from "@/lib/heartbeat";
+import { clearAuthStorage } from "@/lib/api";
 
 const ALUMNI_LOGIN_PATH = "/alumni/login";
 const ALUMNI_REGISTER_PATH = "/alumni/register";
@@ -15,13 +16,11 @@ function isPublicAlumniPage(pathname: string) {
 }
 
 function getAlumniToken() {
-  // sessionStorage utama, localStorage fallback (migrasi)
-  return sessionStorage.getItem("alumni_token") || localStorage.getItem("alumni_token");
+  return localStorage.getItem("alumni_token") || sessionStorage.getItem("alumni_token");
 }
 
 function clearAlumniToken() {
-  sessionStorage.removeItem("alumni_token");
-  localStorage.removeItem("alumni_token");
+  clearAuthStorage();
 }
 
 export default function AlumniLayout({

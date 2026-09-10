@@ -43,24 +43,23 @@ function getAuthToken() {
 
   const pathname = window.location.pathname;
   if (pathname.startsWith("/admin")) {
-    // sessionStorage utama, localStorage fallback (migrasi)
     return (
-      sessionStorage.getItem("access_token") ||
       localStorage.getItem("access_token") ||
+      sessionStorage.getItem("access_token") ||
       localStorage.getItem("token")
     );
   } else if (pathname.startsWith("/alumni")) {
     return (
-      sessionStorage.getItem("alumni_token") ||
-      localStorage.getItem("alumni_token")
+      localStorage.getItem("alumni_token") ||
+      sessionStorage.getItem("alumni_token")
     );
   }
 
   return (
-    sessionStorage.getItem("alumni_token") ||
     localStorage.getItem("alumni_token") ||
-    sessionStorage.getItem("access_token") ||
+    sessionStorage.getItem("alumni_token") ||
     localStorage.getItem("access_token") ||
+    sessionStorage.getItem("access_token") ||
     localStorage.getItem("token")
   );
 }

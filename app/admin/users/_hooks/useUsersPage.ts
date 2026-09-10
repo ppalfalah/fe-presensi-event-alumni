@@ -83,7 +83,7 @@ function getCurrentAdminId() {
   if (typeof window === "undefined") return null;
 
   try {
-    const storedUser = localStorage.getItem("user");
+    const storedUser = localStorage.getItem("user") || sessionStorage.getItem("user");
     if (!storedUser) return null;
 
     const id = Number((JSON.parse(storedUser) as { id?: unknown }).id);

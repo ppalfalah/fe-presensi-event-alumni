@@ -42,7 +42,7 @@ export function useAuthUser() {
   useEffect(() => {
     const loadUser = () => {
       if (typeof window !== "undefined") {
-        const stored = sessionStorage.getItem("user") || localStorage.getItem("user");
+        const stored = localStorage.getItem("user") || sessionStorage.getItem("user");
         if (stored) {
           try {
             setUser(JSON.parse(stored));

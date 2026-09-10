@@ -20,17 +20,12 @@ export function useLogin() {
   return useMutation<LoginAuthResponse, Error, LoginPayload>(
     {
       mutationFn: loginFn,
-      onSuccess: (response, variables) => {
+      onSuccess: (response) => {
         const token = response.data.access_token;
 
-        // Selalu simpan di sessionStorage (hilang saat browser ditutup)
+        // Simpan token di localStorage & sessionStorage agar multi-tab tetap aktif
+        localStorage.setItem("alumni_token", token);
         sessionStorage.setItem("alumni_token", token);
-
-        // Jika "ingat saya" dicentang, simpan juga di localStorage
-        if (variables.remember) {
-          localStorage.setItem("alumni_token", token);
-        }
-        
         sessionStorage.removeItem("just_logged_out");
 
         // Mulai heartbeat untuk menjaga token tetap hidup

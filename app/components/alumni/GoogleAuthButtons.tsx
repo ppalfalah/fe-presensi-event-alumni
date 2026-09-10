@@ -61,6 +61,8 @@ export function GoogleLoginButton({
           if (response.data.success && response.data.data) {
             const { user, access_token } = response.data.data;
 
+            localStorage.setItem("alumni_token", access_token);
+            localStorage.setItem("user", JSON.stringify(user));
             sessionStorage.setItem("alumni_token", access_token);
             sessionStorage.setItem("user", JSON.stringify(user));
 
