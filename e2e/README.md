@@ -1,9 +1,10 @@
-# E2E — Phase 1
+# E2E Foundation — Phases 1–2
 
 Exactly one Chromium smoke test checks the real public landing page: HTTP 200,
 root URL and the heading “Menjaga Silaturahmi, Menjaga Keberkahan.” No API mocks,
-login, storage state, CRUD or spreadsheet scenarios are implemented. Public event
-data is requested by the app, but the smoke does not certify API/data correctness.
+login, storage state, CRUD or spreadsheet scenarios are implemented. Phase 2 adds
+an isolated Laravel/MySQL reset and deterministic baseline; Playwright still has
+only this smoke spec.
 
 ## Run locally
 
@@ -35,17 +36,47 @@ unused in Phase 1. Do not copy production accounts. Config uses Node's native
 provide all three required variables without a file. Missing/invalid values fail
 with an explanatory error; there is no production fallback.
 
-In a separate backend terminal, using the existing **local** configuration:
+## Dedicated backend database
+
+Never run destructive E2E against production or the normal development database.
+Create a separate database once (adjust the MySQL executable path/user locally):
+
+```sql
+CREATE DATABASE presensi_event_e2e
+  CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+In `presensi-event-backend`, copy `.env.e2e.example` to the ignored `.env.e2e`.
+Generate its own app key and fill only local E2E MySQL credentials:
+
+```sh
+php artisan key:generate --env=e2e
+php artisan e2e:status --env=e2e
+php artisan e2e:reset --env=e2e
+```
+
+`e2e:status` connects and verifies `APP_ENV=e2e`, a MySQL/MariaDB driver, the
+configured database name ending `_e2e`, and `SELECT DATABASE()` exactly matching
+`E2E_DB_DATABASE` (default `presensi_event_e2e`). The reset repeats this fail-closed
+guard before `migrate:fresh` and its small E2E seeder. It also verifies and cleans
+only the isolated `storage/app/public/e2e` upload root. Omitting `--env=e2e`, using
+the development database, or selecting another active database exits non-zero.
+
+Baseline identities are local-only and defined identically in both `.env.e2e`
+files: `e2e.admin@example.test` (active super admin) and
+`e2e.alumni@example.test` (active alumni). Their documented E2E passwords may be
+changed, but frontend/backend values must match. No real account is used.
+
+Start the backend in a separate terminal with the verified E2E environment:
 
 ```sh
 cd presensi-event-backend
-php artisan serve --host=localhost --port=8000
+php artisan serve --env=e2e --host=127.0.0.1 --port=8000 --no-reload
 ```
 
-Do not run migrations/reset/seed as part of this smoke. Read-only public requests
-may use the existing local development server for Phase 1 only. Backend is not
-started/stopped by Playwright. The landing shell also renders when API is unavailable;
-that is not evidence of a healthy backend.
+Backend is not started/stopped by Playwright. Before future destructive runs, use
+`e2e:status`, reset once at suite setup, and verify `E2E_API_URL` is localhost.
+The reset is deliberately not automatic per test.
 
 Stop your frontend dev server before running E2E. Playwright starts/stops a fresh
 `next dev --webpack` on `E2E_BASE_URL`, overriding **both** public API environment
@@ -75,8 +106,8 @@ authenticated tests exist; never commit them.
   Before using staging, verify its deployed frontend API URL and DB are isolated;
   a target label cannot prove database isolation or detect an arbitrary production
   hostname. Do not point staging at production or use tunnels to production.
-- No destructive tests on any environment in Phase 1. Future destructive specs
-  must retain this config guard and require verified dedicated fixtures/DB.
+- No destructive Playwright tests exist yet. Future destructive specs must retain
+  both the frontend target guard and backend database guard.
 
 ## Current architecture audit / next phases
 
@@ -100,7 +131,7 @@ authenticated tests exist; never commit them.
   reporting and engagement controllers remain untouched. Presensi uses `hadir`,
   registration uses `attended`. CORS allows configured local origins, including
   ports 3000; supports_credentials on BE does not change FE Bearer behavior.
-- DB: current local connection is MySQL on 127.0.0.1:3306; examples also use MySQL.
+- DB: normal local connection is MySQL on 127.0.0.1:3306; examples also use MySQL.
   PHPUnit uses SQLite `:memory:`, RefreshDatabase and in-process Sanctum helpers.
   These cannot seed/isolate a separately running E2E backend, nor prove MySQL
   strict-mode compatibility. Existing backend feature/unit tests and deployment
@@ -110,12 +141,13 @@ authenticated tests exist; never commit them.
   not a deterministic E2E fixture contract. No existing account credentials were
   copied and no seeder was run.
 
-**Phase 2:** audit/map the black-box spreadsheet; it has not been read or converted.
-**Phase 3:** provision a dedicated local MySQL schema (e.g. `presensi_event_e2e`) and
-least-privileged DB user, separate Laravel `.env.e2e` selected with `--env=e2e`,
-separate backend port/origin, cache/session/storage isolation, safe mail/WhatsApp
-and queue configuration. Ensure cached config cannot select the developer DB.
-Only then add explicit guarded seed/reset/cleanup commands, deterministic accounts
-(including approval states/admin levels), region/event/QR fixtures and controlled
-dates. No such provisioning is performed here. Auth fixture design follows that
-planning; do not proceed automatically.
+Fixture strategy is **baseline reset + small per-test preconditions**. Phase 2 uses
+an E2E-only Artisan reset/seeder and adds no `/api/e2e/*` route. Later phases should
+prefer existing application/admin APIs, adding narrowly scoped E2E-only Artisan
+fixture commands only where APIs cannot establish a state. Never connect Playwright
+directly to MySQL. Add pending/inactive/rejected alumni, events, quotas,
+registrations, attendance, QR windows, domicile and recommendation state only when
+their mapped scenarios require them.
+
+**Next phase:** map scenarios and design auth/feature fixtures. The black-box
+spreadsheet has not been read or converted, and no auth Playwright spec exists.
