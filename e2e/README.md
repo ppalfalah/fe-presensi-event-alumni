@@ -1,10 +1,10 @@
-# E2E Foundation — Phases 1–2
+# E2E Foundation — Phases 1–3
 
-Exactly one Chromium smoke test checks the real public landing page: HTTP 200,
-root URL and the heading “Menjaga Silaturahmi, Menjaga Keberkahan.” No API mocks,
-login, storage state, CRUD or spreadsheet scenarios are implemented. Phase 2 adds
-an isolated Laravel/MySQL reset and deterministic baseline; Playwright still has
-only this smoke spec.
+The Chromium suite contains one public landing-page smoke test, 32 official Phase
+3 browser scenarios from TC-BB001–034, and three `EXTRA-AUTH` regression tests.
+TC-BB020 and TC-BB028 require deterministic Google OAuth infrastructure and are
+marked `SPECIAL_ENV`, not faked as passing tests. Authentication and registration
+use the actual UI; no API login shortcut or storage-state fixture is used.
 
 ## Run locally
 
@@ -86,6 +86,7 @@ API settings. Do not run another Next dev/build in this checkout simultaneously.
 
 ```sh
 npm run test:e2e
+npm run test:e2e:auth
 npm run test:e2e:ui
 npm run test:e2e:headed
 npm run test:e2e:report
@@ -106,8 +107,8 @@ authenticated tests exist; never commit them.
   Before using staging, verify its deployed frontend API URL and DB are isolated;
   a target label cannot prove database isolation or detect an arbitrary production
   hostname. Do not point staging at production or use tunnels to production.
-- No destructive Playwright tests exist yet. Future destructive specs must retain
-  both the frontend target guard and backend database guard.
+- Phase 3 registration scenarios create uniquely named pending alumni only in the
+  dedicated E2E database. Reset once before the suite; never per test.
 
 ## Current architecture audit / next phases
 
@@ -149,5 +150,7 @@ directly to MySQL. Add pending/inactive/rejected alumni, events, quotas,
 registrations, attendance, QR windows, domicile and recommendation state only when
 their mapped scenarios require them.
 
-**Next phase:** map scenarios and design auth/feature fixtures. The black-box
-spreadsheet has not been read or converted, and no auth Playwright spec exists.
+Phase 3 implements only authentication and portal access cases. `EXTRA-AUTH-002`
+and `EXTRA-AUTH-003` intentionally preserve the currently failing anonymous-route
+redirect expectations. Dashboard, CRUD, QR, reports, recommendations, password
+reset, and all other spreadsheet cases remain intentionally unimplemented.

@@ -4,6 +4,11 @@ import { loadEnvFile } from "node:process";
 
 type E2ETarget = "local" | "staging" | "production";
 
+export interface E2ECredentials {
+  admin: { email: string; password: string };
+  alumni: { email: string; password: string };
+}
+
 function required(name: string): string {
   const value = process.env[name]?.trim();
   if (!value) {
@@ -59,4 +64,27 @@ export function loadE2EEnvironment() {
   }
 
   return { target, baseURL, apiURL };
+}
+
+export function getE2ECredentials(): E2ECredentials {
+  const adminEmail = required("E2E_ADMIN_EMAIL");
+  const alumniEmail = required("E2E_ALUMNI_EMAIL");
+
+  for (const [name, email] of [
+    ["E2E_ADMIN_EMAIL", adminEmail],
+    ["E2E_ALUMNI_EMAIL", alumniEmail],
+  ] as const) {
+    if (!email.toLowerCase().endsWith(".test")) {
+      throw new Error(`${name} must use a reserved .test identity for local E2E.`);
+    }
+  }
+
+  if (adminEmail.toLowerCase() === alumniEmail.toLowerCase()) {
+    throw new Error("E2E admin and alumni identities must be different.");
+  }
+
+  return {
+    admin: { email: adminEmail, password: required("E2E_ADMIN_PASSWORD") },
+    alumni: { email: alumniEmail, password: required("E2E_ALUMNI_PASSWORD") },
+  };
 }
