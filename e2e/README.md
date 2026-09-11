@@ -1,4 +1,4 @@
-# E2E Foundation — Phases 1–3
+# E2E Foundation — Phases 1–4
 
 The Chromium suite contains one public landing-page smoke test, 32 official Phase
 3 browser scenarios from TC-BB001–034, and three `EXTRA-AUTH` regression tests.
@@ -152,5 +152,35 @@ their mapped scenarios require them.
 
 Phase 3 implements only authentication and portal access cases. `EXTRA-AUTH-002`
 and `EXTRA-AUTH-003` intentionally preserve the currently failing anonymous-route
-redirect expectations. Dashboard, CRUD, QR, reports, recommendations, password
-reset, and all other spreadsheet cases remain intentionally unimplemented.
+redirect expectations. CRUD, QR, reports, recommendations, password reset, and
+all spreadsheet cases after TC-BB040 remain intentionally unimplemented.
+
+## Phase 4 dashboard fixtures
+
+Dashboard specs prepare one guarded, deterministic state per test. From the
+backend repository, these are also available directly:
+
+```sh
+php artisan e2e:fixture admin-empty --env=e2e
+php artisan e2e:fixture admin-populated --env=e2e
+php artisan e2e:fixture alumni-no-attendance --env=e2e
+php artisan e2e:fixture alumni-with-attendance --env=e2e
+```
+
+Every invocation repeats the same `APP_ENV=e2e`, active `_e2e` database, and
+isolated-storage guard used by `e2e:reset`. The command clears only dashboard
+scenario data inside the dedicated E2E database; it never runs migrations. The
+Playwright helper resolves the sibling backend by default, or uses the optional
+`E2E_BACKEND_PATH` / `E2E_PHP_BINARY` settings.
+
+Run official spreadsheet cases separately from intentionally failing regression
+tests:
+
+```sh
+npm run test:e2e:dashboard
+npm run test:e2e:official
+npm run test:e2e:extra
+```
+
+The official grep includes `TC-BB...` tests only. Run the smoke spec separately
+with `npx playwright test e2e/specs/smoke.spec.ts`. Phase 4 stops at TC-BB040.
