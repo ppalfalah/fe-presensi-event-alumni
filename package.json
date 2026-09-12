@@ -10,6 +10,7 @@
 		"test:e2e": "playwright test",
 		"test:e2e:auth": "playwright test e2e/specs/auth",
 		"test:e2e:dashboard": "playwright test e2e/specs/dashboard",
+		"test:e2e:users": "playwright test e2e/specs/users",
 		"test:e2e:official": "playwright test --grep ^TC-BB",
 		"test:e2e:extra": "playwright test --grep ^EXTRA-",
 		"test:e2e:ui": "playwright test --ui",

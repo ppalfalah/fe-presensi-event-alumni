@@ -11,7 +11,15 @@ export type DashboardFixtureState =
   | "alumni-no-attendance"
   | "alumni-with-attendance";
 
-export async function prepareDashboardFixture(state: DashboardFixtureState) {
+export type UserFixtureState =
+  | "users-empty"
+  | "users-filter"
+  | "users-editable"
+  | "users-deletable"
+  | "users-pagination-10"
+  | "users-pagination-11";
+
+async function prepareFixture(state: DashboardFixtureState | UserFixtureState) {
   const backendPath = resolve(
     process.cwd(),
     process.env.E2E_BACKEND_PATH?.trim() || "../presensi-event-backend",
@@ -38,7 +46,15 @@ export async function prepareDashboardFixture(state: DashboardFixtureState) {
   } catch (error) {
     const output = error as { stderr?: string; stdout?: string; message?: string };
     throw new Error(
-      `Failed to prepare dashboard fixture "${state}". ${output.stderr || output.stdout || output.message || "Unknown Artisan error"}`,
+      `Failed to prepare E2E fixture "${state}". ${output.stderr || output.stdout || output.message || "Unknown Artisan error"}`,
     );
   }
+}
+
+export function prepareDashboardFixture(state: DashboardFixtureState) {
+  return prepareFixture(state);
+}
+
+export function prepareUserFixture(state: UserFixtureState) {
+  return prepareFixture(state);
 }
