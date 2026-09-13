@@ -38,8 +38,24 @@ export type EventFixtureState =
   | "qr-regenerate"
   | "qr-pagination";
 
+export type ReportFixtureState =
+  | "reports-empty"
+  | "reports-summary"
+  | "reports-detail"
+  | "reports-detail-empty"
+  | "reports-full-attendance"
+  | "reports-pagination"
+  | "engagement-overview"
+  | "engagement-17"
+  | "engagement-boundaries"
+  | "engagement-pagination";
+
 async function prepareFixture(
-  state: DashboardFixtureState | UserFixtureState | EventFixtureState,
+  state:
+    | DashboardFixtureState
+    | UserFixtureState
+    | EventFixtureState
+    | ReportFixtureState,
 ) {
   const backendPath = resolve(
     process.cwd(),
@@ -81,5 +97,9 @@ export function prepareUserFixture(state: UserFixtureState) {
 }
 
 export function prepareEventFixture(state: EventFixtureState) {
+  return prepareFixture(state);
+}
+
+export function prepareReportFixture(state: ReportFixtureState) {
   return prepareFixture(state);
 }
