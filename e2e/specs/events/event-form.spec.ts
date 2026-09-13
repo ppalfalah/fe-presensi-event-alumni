@@ -84,27 +84,40 @@ test("TC-BB074 - tanggal event yang sudah lewat ditolak", async ({ page }) => {
   await openEventsPage(page, "events-form");
   await openCreateModal(page);
   await fillValidEventForm(page, { title: "E2E Past Date", date: localDate(-1) });
+  const eventDate = eventFormField(page, "Tanggal Event");
+
+  expect(
+    await eventDate.evaluate((element: HTMLInputElement) => ({
+      valid: element.validity.valid,
+      rangeUnderflow: element.validity.rangeUnderflow,
+    })),
+  ).toEqual({ valid: false, rangeUnderflow: true });
   await page.getByRole("button", { name: "Simpan", exact: true }).click();
 
-  await expect(page.getByText("Tanggal event tidak boleh lebih awal dari hari ini.")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Buat Event Baru" })).toBeVisible();
+  await expect(eventDate).toHaveValue(localDate(-1));
+  expect(
+    await eventDate.evaluate((element: HTMLInputElement) => element.validity.valid),
+  ).toBe(false);
   await expect(eventCard(page, "E2E Past Date")).toHaveCount(0);
 });
 
 test("TC-BB075 - tanggal event hari ini diterima", async ({ page }) => {
   await openEventsPage(page, "events-form");
   await openCreateModal(page);
+  const now = new Date();
+  const isLateInDay = now.getHours() === 23 && now.getMinutes() >= 57;
   await fillValidEventForm(page, {
     title: "E2E Event Today",
     date: localDate(),
-    startTime: "00:00",
+    startTime: isLateInDay ? "00:00" : "23:58",
     endTime: "23:59",
   });
   await page.getByRole("button", { name: "Simpan", exact: true }).click();
 
   await expect(page.getByRole("status")).toContainText("Event berhasil ditambahkan!");
-  const now = new Date();
-  if (now.getHours() === 23 && now.getMinutes() >= 59) {
-    await page.getByRole("button", { name: /^Selesai \(1\)$/ }).click();
+  if (isLateInDay) {
+    await page.getByRole("button", { name: /^Selesai \(\d+\)$/ }).click();
   }
   await expect(eventCard(page, "E2E Event Today")).toBeVisible();
 });

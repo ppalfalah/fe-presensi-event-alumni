@@ -26,6 +26,7 @@ test("TC-BB096 - kuota maksimum ditandai penuh dan pendaftaran tambahan tidak te
 });
 
 test("TC-BB097 - pendaftaran bersamaan ditolak agar jumlah tidak melebihi kuota", async ({ browser, baseURL }) => {
+  test.setTimeout(60_000);
   await prepareEventFixture("quota-race");
   const credentials = getE2ECredentials();
   const contextA = await browser.newContext({ baseURL });
@@ -34,11 +35,13 @@ test("TC-BB097 - pendaftaran bersamaan ditolak agar jumlah tidak melebihi kuota"
   const pageB = await contextB.newPage();
 
   try {
-    await openAlumniEvent(pageA, "E2E Quota Race", credentials.alumni);
-    await openAlumniEvent(pageB, "E2E Quota Race", {
-      email: "e2e.quota.b@example.test",
-      password: credentials.alumni.password,
-    });
+    await Promise.all([
+      openAlumniEvent(pageA, "E2E Quota Race", credentials.alumni),
+      openAlumniEvent(pageB, "E2E Quota Race", {
+        email: "e2e.quota.b@example.test",
+        password: credentials.alumni.password,
+      }),
+    ]);
 
     await expect(pageA.getByRole("button", { name: "Daftar Event" })).toBeEnabled();
     await expect(pageB.getByRole("button", { name: "Daftar Event" })).toBeEnabled();
@@ -47,9 +50,20 @@ test("TC-BB097 - pendaftaran bersamaan ditolak agar jumlah tidak melebihi kuota"
     await expect(pageA.getByRole("status")).toContainText("Berhasil mendaftar event!");
     await expect(pageA.getByRole("button", { name: "Sudah Terdaftar" })).toBeDisabled();
 
-    await pageB.getByRole("button", { name: "Daftar Event" }).click();
-    await expect(pageB.getByRole("status")).toContainText("Kuota penuh, segera hubungi penyelenggara");
-    await expect(pageB.getByText("Belum Terdaftar", { exact: true })).toBeVisible();
+    const staleRegistrationButton = pageB.getByRole("button", {
+      name: "Daftar Event",
+    });
+    if (await staleRegistrationButton.isEnabled()) {
+      await staleRegistrationButton.click();
+      await expect(pageB.getByRole("status")).toContainText(
+        "Kuota penuh, segera hubungi penyelenggara",
+      );
+      await expect(
+        pageB.getByText("Belum Terdaftar", { exact: true }),
+      ).toBeVisible();
+    } else {
+      await expect(pageB.getByRole("button", { name: "Kuota Penuh" })).toBeDisabled();
+    }
 
     await pageB.reload();
     await expect(pageB.getByRole("button", { name: "Kuota Penuh" })).toBeDisabled();

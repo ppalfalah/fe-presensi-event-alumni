@@ -4,6 +4,7 @@ import {
   OLD_QR_TOKEN,
   generateQr,
   openQrPage,
+  qrControlPanel,
   qrDurationInput,
   qrPreview,
   qrTokenValue,
@@ -15,6 +16,11 @@ test("TC-BB103 - memilih event menyiapkan detail dan pratinjau QR Code", async (
   await openQrPage(page, "qr-multiple-events");
   await selectQrEvent(page, "E2E QR Selection Beta");
 
+  await expect(
+    qrControlPanel(page)
+      .locator("p")
+      .filter({ hasText: "E2E QR Selection Beta" }),
+  ).toHaveText("E2E QR Selection Beta");
   await expect(qrPreview(page).getByText("QR Belum Dibuat", { exact: true })).toBeVisible();
   await expect(qrPreview(page).getByText(/klik Buat QR Code/i)).toBeVisible();
 });

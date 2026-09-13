@@ -95,9 +95,12 @@ test("TC-BB086 - membatalkan publikasi memindahkan event ke Tidak Dipublikasikan
 test("TC-BB087 - pagination event tidak dapat melewati halaman pertama", async ({ page }) => {
   await openEventsPage(page, "events-pagination");
 
-  await expect(page.getByText("Menampilkan 1-3 dari 4 event")).toBeVisible();
   await expect(page.getByRole("button", { name: "Sebelumnya" })).toBeDisabled();
   await expect(page.getByRole("button", { name: "Berikutnya" })).toBeEnabled();
+  await expect(eventCard(page, "E2E Pagination Event 4")).toBeVisible();
+  await expect(eventCard(page, "E2E Pagination Event 3")).toBeVisible();
+  await expect(eventCard(page, "E2E Pagination Event 2")).toBeVisible();
+  await expect(eventCard(page, "E2E Pagination Event 1")).toHaveCount(0);
 });
 
 test("TC-BB088 - pagination event tidak dapat melewati halaman terakhir", async ({ page }) => {
@@ -105,7 +108,8 @@ test("TC-BB088 - pagination event tidak dapat melewati halaman terakhir", async 
   const next = page.getByRole("button", { name: "Berikutnya" });
   await next.click();
 
-  await expect(page.getByText("Menampilkan 4-4 dari 4 event")).toBeVisible();
+  await expect(eventCard(page, "E2E Pagination Event 1")).toBeVisible();
+  await expect(eventCard(page, "E2E Pagination Event 4")).toHaveCount(0);
   await expect(next).toBeDisabled();
   await expect(page.getByRole("button", { name: "Sebelumnya" })).toBeEnabled();
 });

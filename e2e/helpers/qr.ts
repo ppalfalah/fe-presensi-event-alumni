@@ -44,8 +44,7 @@ export async function selectQrEvent(page: Page, eventTitle: string) {
 
   await expect(select.getByRole("option", { name: eventTitle })).toBeAttached();
   await select.selectOption({ label: eventTitle });
-  await expect(select).not.toHaveValue("");
-  await expect(qrControlPanel(page).getByText(eventTitle, { exact: true })).toBeVisible();
+  await expect(select.locator("option:checked")).toHaveText(eventTitle);
 }
 
 export async function generateQr(page: Page, durationDays: number) {
