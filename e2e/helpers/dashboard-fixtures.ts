@@ -50,12 +50,15 @@ export type ReportFixtureState =
   | "engagement-boundaries"
   | "engagement-pagination";
 
+export type Phase9FixtureState = "broadcast-event" | "settings-admin";
+
 async function prepareFixture(
   state:
     | DashboardFixtureState
     | UserFixtureState
     | EventFixtureState
-    | ReportFixtureState,
+    | ReportFixtureState
+    | Phase9FixtureState,
 ) {
   const backendPath = resolve(
     process.cwd(),
@@ -101,5 +104,9 @@ export function prepareEventFixture(state: EventFixtureState) {
 }
 
 export function prepareReportFixture(state: ReportFixtureState) {
+  return prepareFixture(state);
+}
+
+export function preparePhase9Fixture(state: Phase9FixtureState) {
   return prepareFixture(state);
 }
