@@ -1,7 +1,15 @@
 import { expect, test } from "@playwright/test";
-import { eventCard, eventFormField, fillValidEventForm, localDate, openEventsPage } from "../../helpers/events";
+import {
+  eventCard,
+  eventFormField,
+  fillValidEventForm,
+  localDate,
+  openEventsPage,
+  waitForEventFormData,
+} from "../../helpers/events";
 
 async function openCreateModal(page: import("@playwright/test").Page) {
+  await waitForEventFormData(page);
   await page.getByRole("button", { name: "Buat Event Baru" }).click();
   await expect(page.getByRole("heading", { name: "Buat Event Baru" })).toBeVisible();
 }
@@ -94,6 +102,10 @@ test("TC-BB075 - tanggal event hari ini diterima", async ({ page }) => {
   await page.getByRole("button", { name: "Simpan", exact: true }).click();
 
   await expect(page.getByRole("status")).toContainText("Event berhasil ditambahkan!");
+  const now = new Date();
+  if (now.getHours() === 23 && now.getMinutes() >= 59) {
+    await page.getByRole("button", { name: /^Selesai \(1\)$/ }).click();
+  }
   await expect(eventCard(page, "E2E Event Today")).toBeVisible();
 });
 

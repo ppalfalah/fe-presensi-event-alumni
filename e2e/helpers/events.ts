@@ -21,6 +21,13 @@ export async function openEventsPage(page: Page, state: EventFixtureState) {
   await expect(page.getByRole("heading", { name: "Manajemen Event" })).toBeVisible();
 }
 
+export async function waitForEventFormData(page: Page) {
+  const categorySection = page.getByRole("button", { name: /Kelola Kategori Event/ });
+
+  await expect(categorySection.getByText(/^\d+ kategori$/)).toBeVisible();
+  await expect(page.getByText("Tidak ada event ditemukan")).toBeVisible();
+}
+
 export function eventCard(page: Page, title: string): Locator {
   return page.getByRole("button", { name: `Lihat detail ${title}`, exact: true });
 }
