@@ -19,7 +19,22 @@ export type UserFixtureState =
   | "users-pagination-10"
   | "users-pagination-11";
 
-async function prepareFixture(state: DashboardFixtureState | UserFixtureState) {
+export type EventFixtureState =
+  | "events-empty"
+  | "events-list"
+  | "events-form"
+  | "events-edit"
+  | "events-status"
+  | "events-registrations"
+  | "events-pagination"
+  | "event-categories"
+  | "quota-one-remaining"
+  | "quota-full"
+  | "quota-race";
+
+async function prepareFixture(
+  state: DashboardFixtureState | UserFixtureState | EventFixtureState,
+) {
   const backendPath = resolve(
     process.cwd(),
     process.env.E2E_BACKEND_PATH?.trim() || "../presensi-event-backend",
@@ -56,5 +71,9 @@ export function prepareDashboardFixture(state: DashboardFixtureState) {
 }
 
 export function prepareUserFixture(state: UserFixtureState) {
+  return prepareFixture(state);
+}
+
+export function prepareEventFixture(state: EventFixtureState) {
   return prepareFixture(state);
 }
