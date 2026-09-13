@@ -30,7 +30,13 @@ export type EventFixtureState =
   | "event-categories"
   | "quota-one-remaining"
   | "quota-full"
-  | "quota-race";
+  | "quota-race"
+  | "qr-generate"
+  | "qr-event-no-code"
+  | "qr-event-active-code"
+  | "qr-multiple-events"
+  | "qr-regenerate"
+  | "qr-pagination";
 
 async function prepareFixture(
   state: DashboardFixtureState | UserFixtureState | EventFixtureState,
