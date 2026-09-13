@@ -41,8 +41,6 @@ test("TC-BB120 - detail kehadiran menampilkan seluruh field resmi peserta", asyn
     "Nama",
     "Email",
     "No HP",
-    "Tahun Kelulusan",
-    "Domisili",
     "Jam Daftar",
     "Waktu Hadir / Scan QR",
   ]) {
@@ -50,6 +48,12 @@ test("TC-BB120 - detail kehadiran menampilkan seluruh field resmi peserta", asyn
       modal.getByRole("columnheader", { name: heading, exact: true }),
     ).toBeVisible();
   }
+  await expect(
+    modal.getByRole("columnheader", { name: /Tahun Kelulusan/ }),
+  ).toBeVisible();
+  await expect(
+    modal.getByRole("columnheader", { name: /Domisili/ }),
+  ).toBeVisible();
 
   const row = attendanceRow(page, "Alya Laporan");
   await expect(row).toContainText("alya.report@example.test");

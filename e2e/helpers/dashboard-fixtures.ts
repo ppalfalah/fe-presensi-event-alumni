@@ -77,7 +77,7 @@ async function prepareFixture(
         cwd: backendPath,
         env: process.env,
         windowsHide: true,
-        timeout: 30_000,
+        timeout: state === "engagement-boundaries" ? 60_000 : 30_000,
       },
     );
   } catch (error) {

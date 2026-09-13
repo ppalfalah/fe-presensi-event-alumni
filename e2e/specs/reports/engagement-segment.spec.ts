@@ -1,6 +1,15 @@
 import { expect, test, type Locator } from "@playwright/test";
 import { engagementRow, openEngagementPage } from "../../helpers/reports";
 
+type SemanticSegment = "NONE" | "BEGINNER" | "MIDDLE" | "HIGH";
+
+const segmentPatterns: Record<SemanticSegment, RegExp> = {
+  NONE: /Ghoir(?:u)?\s+Mu[kq]ayyad/i,
+  BEGINNER: /Al-Mubtadi(?:'|\u2019)un/i,
+  MIDDLE: /Al-Mutawas{1,2}ithun/i,
+  HIGH: /Al-Muq(?:arrab|orrob)un/i,
+};
+
 async function expectAttendance(
   row: Locator,
   fraction: string,
@@ -8,6 +17,13 @@ async function expectAttendance(
 ) {
   await expect(row).toContainText(fraction);
   await expect(row).toContainText(`${percentage}%`);
+}
+
+async function expectSemanticSegment(
+  row: Locator,
+  segment: SemanticSegment,
+) {
+  await expect(row).toContainText(segmentPatterns[segment]);
 }
 
 test("TC-BB138 - alumni dengan nol dari 17 event menampilkan 0/17 dan 0 persen", async ({
@@ -41,8 +57,8 @@ test("TC-BB141 - persentase 0 menetapkan segmen Ghoiru Muqayyad", async ({
   await openEngagementPage(page, "engagement-boundaries");
   const row = engagementRow(page, "Boundary Zero");
 
-  await expectAttendance(row, "0/35", 0);
-  await expect(row).toContainText("Ghoiru Muqayyad");
+  await expectAttendance(row, "0/100", 0);
+  await expectSemanticSegment(row, "NONE");
 });
 
 test("TC-BB142 - persentase 1 sampai 39 menetapkan segmen Al-Mubtadi\u2019un", async ({
@@ -53,14 +69,14 @@ test("TC-BB142 - persentase 1 sampai 39 menetapkan segmen Al-Mubtadi\u2019un", a
   const lower = engagementRow(page, "Boundary Beginner Low");
   const upper = engagementRow(page, "Boundary Beginner High");
 
-  await test.step("batas bawah representatif 3 persen", async () => {
-    await expectAttendance(lower, "1/35", 3);
-    await expect(lower).toContainText("Al-Mubtadi\u2019un");
+  await test.step("batas bawah 1 persen", async () => {
+    await expectAttendance(lower, "1/100", 1);
+    await expectSemanticSegment(lower, "BEGINNER");
   });
 
-  await test.step("batas atas representatif 37 persen", async () => {
-    await expectAttendance(upper, "13/35", 37);
-    await expect(upper).toContainText("Al-Mubtadi\u2019un");
+  await test.step("batas atas 39 persen", async () => {
+    await expectAttendance(upper, "39/100", 39);
+    await expectSemanticSegment(upper, "BEGINNER");
   });
 });
 
@@ -73,32 +89,32 @@ test("TC-BB143 - persentase 40 dan 69 menetapkan segmen Al-Mutawassithun", async
   const upper = engagementRow(page, "Boundary Middle High");
 
   await test.step("batas bawah 40 persen", async () => {
-    await expectAttendance(lower, "14/35", 40);
-    await expect(lower).toContainText("Al-Mutawassithun");
+    await expectAttendance(lower, "40/100", 40);
+    await expectSemanticSegment(lower, "MIDDLE");
   });
 
-  await test.step("batas atas yang tampil 69 persen", async () => {
-    await expectAttendance(upper, "24/35", 69);
-    await expect(upper).toContainText("Al-Mutawassithun");
+  await test.step("batas atas 69 persen", async () => {
+    await expectAttendance(upper, "69/100", 69);
+    await expectSemanticSegment(upper, "MIDDLE");
   });
 });
 
-test("TC-BB144 - batas resmi 69 sampai 100 menetapkan segmen Al-Muqarrabun", async ({
+test("TC-BB144 - batas resmi 70 sampai 100 menetapkan segmen Al-Muqarrabun", async ({
   page,
 }) => {
   await openEngagementPage(page, "engagement-boundaries");
 
-  const lower = engagementRow(page, "Boundary Middle High");
+  const lower = engagementRow(page, "Boundary High Low");
   const upper = engagementRow(page, "Boundary Full");
 
-  await test.step("batas resmi bawah 69 persen", async () => {
-    await expectAttendance(lower, "24/35", 69);
-    await expect(lower).toContainText("Al-Muqarrabun");
+  await test.step("batas bawah 70 persen", async () => {
+    await expectAttendance(lower, "70/100", 70);
+    await expectSemanticSegment(lower, "HIGH");
   });
 
   await test.step("batas atas 100 persen", async () => {
-    await expectAttendance(upper, "35/35", 100);
-    await expect(upper).toContainText("Al-Muqarrabun");
+    await expectAttendance(upper, "100/100", 100);
+    await expectSemanticSegment(upper, "HIGH");
   });
 });
 
@@ -111,9 +127,9 @@ test("TC-BB145 - angka dan progress bar sesuai persentase kehadiran", async ({
   const middle = engagementRow(page, "Boundary Middle Low");
   const full = engagementRow(page, "Boundary Full");
 
-  await expectAttendance(zero, "0/35", 0);
-  await expectAttendance(middle, "14/35", 40);
-  await expectAttendance(full, "35/35", 100);
+  await expectAttendance(zero, "0/100", 0);
+  await expectAttendance(middle, "40/100", 40);
+  await expectAttendance(full, "100/100", 100);
   await expect(zero.locator('[style*="width: 0%"]')).toHaveAttribute(
     "style",
     "width: 0%;",

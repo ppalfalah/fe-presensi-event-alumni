@@ -32,7 +32,7 @@ test("TC-BB133 - pencarian nama menampilkan alumni yang sesuai", async ({
 
   await page
     .getByPlaceholder("Cari nama, email, atau tahun kelulusan...")
-    .fill("Alya Pemula");
+    .fill("Alya");
   await expect(engagementRow(page, "Alya Pemula")).toBeVisible();
   await expect(engagementRow(page, "Bima Pemula")).toHaveCount(0);
   await expect(page.getByText("Menampilkan 1-1 dari 1 alumni")).toBeVisible();
@@ -52,4 +52,3 @@ test("TC-BB134 - pencarian nama yang tidak terdaftar menampilkan keadaan kosong"
     }),
   ).toBeVisible();
 });
-

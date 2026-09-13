@@ -71,7 +71,15 @@ test("TC-BB128 - tingkat kehadiran seluruh peserta adalah maksimal 100 persen", 
   await openReportsPage(page, "reports-full-attendance");
 
   const row = reportEventRow(page, "E2E Report Full Attendance");
-  await expect(row).toContainText("100%");
-  await expect(row.locator('[style*="width: 100%"]')).toBeVisible();
-  await expect(row).not.toContainText(/10[1-9]%|1[1-9]\d%|[2-9]\d{2,}%/);
+  const rateCell = row.getByRole("cell").filter({ hasText: "100%" });
+  const percentage = rateCell.getByText("100%", { exact: true });
+
+  await expect(percentage).toBeVisible();
+  await expect(rateCell.locator('[style*="width: 100%"]')).toBeVisible();
+
+  const displayedPercentage = Number(
+    (await percentage.textContent())?.replace("%", ""),
+  );
+  expect(displayedPercentage).toBe(100);
+  expect(displayedPercentage).toBeLessThanOrEqual(100);
 });

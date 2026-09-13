@@ -15,7 +15,7 @@ test("TC-BB135 - filter tahun kelulusan hanya menampilkan alumni pada tahun terp
 }) => {
   await openEngagementPage(page, "engagement-overview");
 
-  await page.getByPlaceholder("Tahun Kelulusan").fill("2021");
+  await page.getByPlaceholder("Tahun Kelulusan", { exact: true }).fill("2021");
   await expect(engagementRow(page, "Citra Menengah")).toBeVisible();
   await expect(engagementRow(page, "Alya Pemula")).toHaveCount(0);
   await expect(engagementRow(page, "Damar Aktif")).toHaveCount(0);
@@ -40,7 +40,7 @@ test("TC-BB137 - kombinasi nama, tahun, dan segment menerapkan seluruh filter", 
   await page
     .getByPlaceholder("Cari nama, email, atau tahun kelulusan...")
     .fill("Damar");
-  await page.getByPlaceholder("Tahun Kelulusan").fill("2020");
+  await page.getByPlaceholder("Tahun Kelulusan", { exact: true }).fill("2020");
   await segmentSelect(page).selectOption("Al-Muqorrobun");
 
   const row = engagementRow(page, "Damar Aktif");
@@ -50,4 +50,3 @@ test("TC-BB137 - kombinasi nama, tahun, dan segment menerapkan seluruh filter", 
   await expect(engagementRow(page, "Bima Pemula")).toHaveCount(0);
   await expect(page.getByText("Menampilkan 1-1 dari 1 alumni")).toBeVisible();
 });
-
