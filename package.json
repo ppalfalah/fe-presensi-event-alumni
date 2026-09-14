@@ -18,6 +18,7 @@
 		"test:e2e:phase10": "playwright test e2e/specs/phase10",
 		"test:e2e:phase11": "playwright test e2e/specs/phase11",
 		"test:e2e:phase12": "playwright test e2e/specs/phase12",
+		"test:e2e:phase13": "playwright test e2e/specs/phase13",
 		"test:e2e:official": "playwright test --grep ^TC-BB",
 		"test:e2e:extra": "playwright test --grep ^EXTRA-",
 		"test:e2e:ui": "playwright test --ui",

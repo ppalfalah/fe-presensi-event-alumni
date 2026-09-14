@@ -11,7 +11,7 @@ export interface ImageFilePayload {
   buffer: Buffer;
 }
 
-async function serveIsolatedE2EAvatars(page: Page) {
+export async function serveIsolatedE2EAvatars(page: Page) {
   const configuredApiUrl = process.env.E2E_API_URL?.trim();
   if (!configuredApiUrl) {
     throw new Error("E2E_API_URL is required to serve isolated E2E avatars.");

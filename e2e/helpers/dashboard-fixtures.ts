@@ -85,6 +85,21 @@ export type Phase12FixtureState =
   | "recommendation-inactive-past"
   | "recommendation-dominant-category";
 
+export type Phase13FixtureState =
+  | "notifications-unread"
+  | "notifications-zero-unread"
+  | "notifications-popup"
+  | "notifications-event"
+  | "notifications-mixed"
+  | "notifications-all-unread"
+  | "notifications-summary"
+  | "notifications-refresh"
+  | "notifications-refresh-add"
+  | "notifications-empty"
+  | "profile-complete"
+  | "profile-avatar"
+  | "profile-no-avatar";
+
 async function prepareFixture(
   state:
     | DashboardFixtureState
@@ -94,7 +109,8 @@ async function prepareFixture(
     | Phase9FixtureState
     | Phase10FixtureState
     | Phase11FixtureState
-    | Phase12FixtureState,
+    | Phase12FixtureState
+    | Phase13FixtureState,
 ) {
   const backendPath = resolve(
     process.cwd(),
@@ -156,5 +172,9 @@ export function preparePhase11Fixture(state: Phase11FixtureState) {
 }
 
 export function preparePhase12Fixture(state: Phase12FixtureState) {
+  return prepareFixture(state);
+}
+
+export function preparePhase13Fixture(state: Phase13FixtureState) {
   return prepareFixture(state);
 }
