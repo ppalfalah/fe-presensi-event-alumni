@@ -62,6 +62,17 @@ export type Phase10FixtureState =
   | "alumni-event-quota-full"
   | "alumni-event-quota-cancel";
 
+export type Phase11FixtureState =
+  | "scan-base"
+  | "scan-valid"
+  | "scan-event-not-started"
+  | "scan-event-ended"
+  | "scan-unregistered"
+  | "scan-already-attended"
+  | "scan-qr-before-valid"
+  | "scan-qr-valid-window"
+  | "scan-qr-expired";
+
 async function prepareFixture(
   state:
     | DashboardFixtureState
@@ -69,7 +80,8 @@ async function prepareFixture(
     | EventFixtureState
     | ReportFixtureState
     | Phase9FixtureState
-    | Phase10FixtureState,
+    | Phase10FixtureState
+    | Phase11FixtureState,
 ) {
   const backendPath = resolve(
     process.cwd(),
@@ -123,5 +135,9 @@ export function preparePhase9Fixture(state: Phase9FixtureState) {
 }
 
 export function preparePhase10Fixture(state: Phase10FixtureState) {
+  return prepareFixture(state);
+}
+
+export function preparePhase11Fixture(state: Phase11FixtureState) {
   return prepareFixture(state);
 }
