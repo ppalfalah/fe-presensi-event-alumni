@@ -52,13 +52,24 @@ export type ReportFixtureState =
 
 export type Phase9FixtureState = "broadcast-event" | "settings-admin";
 
+export type Phase10FixtureState =
+  | "alumni-events-list"
+  | "alumni-events-empty"
+  | "alumni-events-filters"
+  | "alumni-event-unregistered"
+  | "alumni-event-registered"
+  | "alumni-event-quota-register"
+  | "alumni-event-quota-full"
+  | "alumni-event-quota-cancel";
+
 async function prepareFixture(
   state:
     | DashboardFixtureState
     | UserFixtureState
     | EventFixtureState
     | ReportFixtureState
-    | Phase9FixtureState,
+    | Phase9FixtureState
+    | Phase10FixtureState,
 ) {
   const backendPath = resolve(
     process.cwd(),
@@ -108,5 +119,9 @@ export function prepareReportFixture(state: ReportFixtureState) {
 }
 
 export function preparePhase9Fixture(state: Phase9FixtureState) {
+  return prepareFixture(state);
+}
+
+export function preparePhase10Fixture(state: Phase10FixtureState) {
   return prepareFixture(state);
 }
