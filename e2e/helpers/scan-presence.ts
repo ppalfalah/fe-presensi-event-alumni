@@ -130,6 +130,13 @@ export async function openScanPage(
   feed: FakeCameraFeed,
 ) {
   await preparePhase11Fixture(state);
+  await openPreparedScanPage(page, feed);
+}
+
+export async function openPreparedScanPage(
+  page: Page,
+  feed: FakeCameraFeed,
+) {
   await installFakeCamera(page, feed);
   await openAlumniLogin(page);
   await loginAsAlumniThroughUI(page, getE2ECredentials().alumni);

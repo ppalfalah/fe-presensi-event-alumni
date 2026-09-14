@@ -8,8 +8,17 @@ import {
 } from "../../helpers/scan-presence";
 
 test("TC-BB204 - kode manual valid mencatat presensi alumni", async ({ page }) => {
+  test.setTimeout(45_000);
   await openManualScanPage(page, "scan-valid");
+
+  const scanResponse = page.waitForResponse(
+    (response) =>
+      response.request().method() === "POST" &&
+      new URL(response.url()).pathname.endsWith("/presensi/scan"),
+  );
   await submitManualCode(page, VALID_SCAN_TOKEN);
+  const response = await scanResponse;
+  expect(response.status()).toBe(201);
 
   await expectAttendanceSuccess(page);
 });

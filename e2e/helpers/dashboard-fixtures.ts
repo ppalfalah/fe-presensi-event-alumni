@@ -73,6 +73,18 @@ export type Phase11FixtureState =
   | "scan-qr-valid-window"
   | "scan-qr-expired";
 
+export type Phase12FixtureState =
+  | "history-empty"
+  | "history-populated"
+  | "history-detail"
+  | "history-after-scan"
+  | "recommendation-single-category"
+  | "recommendation-new-user"
+  | "recommendation-active-match"
+  | "recommendation-no-active-match"
+  | "recommendation-inactive-past"
+  | "recommendation-dominant-category";
+
 async function prepareFixture(
   state:
     | DashboardFixtureState
@@ -81,7 +93,8 @@ async function prepareFixture(
     | ReportFixtureState
     | Phase9FixtureState
     | Phase10FixtureState
-    | Phase11FixtureState,
+    | Phase11FixtureState
+    | Phase12FixtureState,
 ) {
   const backendPath = resolve(
     process.cwd(),
@@ -139,5 +152,9 @@ export function preparePhase10Fixture(state: Phase10FixtureState) {
 }
 
 export function preparePhase11Fixture(state: Phase11FixtureState) {
+  return prepareFixture(state);
+}
+
+export function preparePhase12Fixture(state: Phase12FixtureState) {
   return prepareFixture(state);
 }
