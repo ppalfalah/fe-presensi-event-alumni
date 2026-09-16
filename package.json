@@ -6,7 +6,25 @@
 		"dev": "next dev --webpack",
 		"build": "next build",
 		"start": "next start",
-		"lint": "eslint"
+		"lint": "eslint",
+		"test:e2e": "playwright test",
+		"test:e2e:auth": "playwright test e2e/specs/auth",
+		"test:e2e:dashboard": "playwright test e2e/specs/dashboard",
+		"test:e2e:users": "playwright test e2e/specs/users",
+		"test:e2e:events": "playwright test e2e/specs/events",
+		"test:e2e:qr": "playwright test e2e/specs/qr",
+		"test:e2e:reports": "playwright test e2e/specs/reports",
+		"test:e2e:phase9": "playwright test e2e/specs/phase9",
+		"test:e2e:phase10": "playwright test e2e/specs/phase10",
+		"test:e2e:phase11": "playwright test e2e/specs/phase11",
+		"test:e2e:phase12": "playwright test e2e/specs/phase12",
+		"test:e2e:phase13": "playwright test e2e/specs/phase13",
+		"test:e2e:official": "playwright test --grep \"TC-BB[0-9]{3}\"",
+		"test:e2e:extra": "playwright test --grep \"EXTRA-\"",
+		"audit:e2e:official": "node e2e/scripts/audit-official-inventory.mjs",
+		"test:e2e:ui": "playwright test --ui",
+		"test:e2e:headed": "playwright test --headed",
+		"test:e2e:report": "playwright show-report"
 	},
 	"dependencies": {
 		"@tanstack/react-query": "^5.100.14",
@@ -22,6 +40,7 @@
 		"react-dom": "19.2.3"
 	},
 	"devDependencies": {
+		"@playwright/test": "^1.63.0",
 		"@tailwindcss/postcss": "^4",
 		"@types/node": "^20",
 		"@types/qrcode": "^1.5.6",
