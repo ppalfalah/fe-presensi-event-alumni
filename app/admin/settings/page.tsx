@@ -159,15 +159,24 @@ export default function SettingsPage() {
 		new: false,
 		confirm: false,
 	});
+	const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 	const handleSaveProfileWithPopup = () => {
-		const nextName = effectiveName.trim();
-		const nextEmail = effectiveEmail.trim();
+		const nextName = effectiveName.trim().replace(/\s+/g, " ");
+		const nextEmail = effectiveEmail.trim().toLowerCase();
 
 		if (!nextName || !nextEmail) {
 			setProfilePopup({
 				type: "error",
 				message: "Nama dan email administrator wajib diisi.",
+			});
+			return;
+		}
+
+		if (!EMAIL_REGEX.test(nextEmail)) {
+			setProfilePopup({
+				type: "error",
+				message: "Format email tidak valid. Contoh: admin@pesantren.ac.id",
 			});
 			return;
 		}
@@ -181,6 +190,7 @@ export default function SettingsPage() {
 				onSuccess: () => {
 					setName(null);
 					setEmail(null);
+
 					setProfilePopup({
 						type: "success",
 						message: "Profil administrator berhasil diperbarui.",
@@ -198,7 +208,6 @@ export default function SettingsPage() {
 			},
 		);
 	};
-
 
 	const handleUpdatePasswordWithPopup = () => {
 		setPasswordPopup(null);

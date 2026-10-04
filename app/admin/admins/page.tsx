@@ -279,14 +279,14 @@ export default function AdminManagementPage() {
     if (!validateForm()) return;
 
     const payload: CreateAdminPayload & UpdateAdminPayload = {
-      first_name: formValues.first_name,
-      last_name: formValues.last_name,
-      email: formValues.email,
-      phone: formValues.phone,
+      first_name: formValues.first_name.trim(),
+      last_name: formValues.last_name.trim(),
+      email: formValues.email.trim().toLowerCase(),
+      phone: formValues.phone.trim(),
       gender: formValues.gender,
       admin_level: formValues.admin_level,
     };
-
+    
     if (formValues.password) {
       payload.password = formValues.password;
       payload.password_confirmation = formValues.password_confirmation;

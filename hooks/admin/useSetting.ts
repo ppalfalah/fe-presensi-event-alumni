@@ -59,38 +59,57 @@ export function useAdminProfile() {
 		queryFn: async () => {
 			const { data } = await api.get("/auth/me");
 			const user = data.data.user;
-			return { name: user.name, email: user.email, avatar_url: user.avatar_url ?? null };
+
+			return {
+				name: [user.first_name, user.last_name]
+					.filter(Boolean)
+					.join(" "),
+				email: user.email,
+				avatar_url: user.avatar_url ?? null,
+			};
 		},
 	});
 }
 
 // PUT update profil admin via /auth/profile
 export function useUpdateAdminProfile() {
-  const queryClient = useQueryClient();
+	const queryClient = useQueryClient();
 
-  return useMutation<AdminProfile, Error, UpdateProfilePayload>({
-    mutationFn: async (payload) => {
-      const { data } = await api.put("/auth/profile", payload);
+	return useMutation<AdminProfile, Error, UpdateProfilePayload>({
+		mutationFn: async (payload) => {
+			const normalizedName = payload.name
+				.trim()
+				.replace(/\s+/g, " ");
 
-      return data.data.user;
-    },
+			const [firstName, ...lastNameParts] =
+				normalizedName.split(" ");
 
-    onSuccess: (updatedProfile, variables) => {
-      queryClient.setQueryData<AdminProfile>(
-        ["admin-profile"],
-        (old) => ({
-          ...old,
-          ...updatedProfile,
-          name: variables.name,
-          email: variables.email,
-        }),
-      );
+			const lastName = lastNameParts.join(" ");
 
-      // queryClient.invalidateQueries({
-      //   queryKey: ["admin-profile"],
-      // });
-    },
-  });
+			const { data } = await api.put("/auth/profile", {
+				first_name: firstName,
+				last_name: lastName || null,
+				email: payload.email.trim().toLowerCase(),
+			});
+
+			const user = data.data.user;
+
+			return {
+				name: [user.first_name, user.last_name]
+					.filter(Boolean)
+					.join(" "),
+				email: user.email,
+				avatar_url: user.avatar_url ?? null,
+			};
+		},
+
+		onSuccess: (updatedProfile) => {
+			queryClient.setQueryData<AdminProfile>(
+				["admin-profile"],
+				updatedProfile,
+			);
+		},
+	});
 }
 
 // POST upload avatar admin via /auth/profile/avatar
