@@ -383,6 +383,7 @@ export default function SettingsPage() {
 												ref={avatarFileRef}
 												type="file"
 												accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+												className="hidden"
 												onChange={(e) => {
 													const file = e.target.files?.[0];
 
