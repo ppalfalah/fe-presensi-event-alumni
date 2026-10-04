@@ -382,21 +382,27 @@ export default function SettingsPage() {
 											<input
 												ref={avatarFileRef}
 												type="file"
-												accept="image/*"
-												className="hidden"
+												accept=".jpg,.jpeg,.png,image/jpeg,image/png"
 												onChange={(e) => {
 													const file = e.target.files?.[0];
+
 													if (file) {
-														if (file.size > 2 * 1024 * 1024) {
-															alert(
-																"Ukuran foto maksimal 2 MB. Silakan pilih foto yang lebih kecil.",
-															);
+														const allowedTypes = ["image/jpeg", "image/png"];
+
+														if (!allowedTypes.includes(file.type)) {
+															alert("Format file harus JPG, JPEG, atau PNG.");
 															e.target.value = "";
 															return;
 														}
+
+														if (file.size > 2 * 1024 * 1024) {
+															alert("Ukuran file maksimal 2 MB.");
+															e.target.value = "";
+															return;
+														}
+
 														uploadAvatar.mutate(file);
 													}
-													e.target.value = "";
 												}}
 											/>
 										</div>
@@ -405,7 +411,7 @@ export default function SettingsPage() {
 											Administrator
 										</span>
 										<p className="mt-3 text-xs leading-5 text-[#0D5C3A]/50">
-											JPG, PNG, atau WebP. Maksimal 2 MB.
+											JPG, JPEG atau PNG. Maksimal 2 MB.
 										</p>
 									</div>
 
