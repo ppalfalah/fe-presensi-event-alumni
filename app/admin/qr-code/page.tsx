@@ -28,6 +28,7 @@ import {
 } from "@/hooks/admin/useEvents";
 import { getApiErrorMessage } from "@/lib/api";
 
+
 // ─── QR Placeholder SVG ───────────────────────────────────────────────────────
 function QRPlaceholder({
   size = 120,
@@ -251,6 +252,7 @@ export default function GenerateQRPage() {
   const [generatedQr, setGeneratedQr] = useState<EventQrCode | null>(null);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [isGeneratingQrImage, setIsGeneratingQrImage] = useState(false);
+  const [isQrModalOpen, setIsQrModalOpen] = useState(false);
   const [feedback, setFeedback] = useState<{
     type: "success" | "error";
     message: string;
@@ -709,18 +711,14 @@ export default function GenerateQRPage() {
                 </button>
 
                 <button
-                  type="button"
-                  onClick={() => {
-                    if (qrDataUrl) {
-                      window.open(qrDataUrl, "_blank");
-                    }
-                  }}
-                  disabled={!qrDataUrl}
-                  className="flex items-center gap-2 border-2 border-[#D4AF37] text-[#9A7A1A] hover:bg-[#D4AF37]/10 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all disabled:opacity-60 disabled:cursor-not-allowed"
-                >
-                  <ExternalLink size={16} />
-                  Buka QR
-                </button>
+                type="button"
+                onClick={() => setIsQrModalOpen(true)}
+                disabled={!qrDataUrl}
+                className="flex items-center gap-2 border-2 border-[#D4AF37] text-[#9A7A1A] hover:bg-[#D4AF37]/10 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                <ExternalLink size={16} />
+                Buka QR
+              </button>
               </div>
             </div>
           )}
@@ -774,6 +772,88 @@ export default function GenerateQRPage() {
       <p className="text-center text-xs text-[#0D5C3A]/40 pb-4">
         © 2026 Sistem Presensi Event - Pondok Pesantren Al-Qur&apos;an Al-Falah
       </p>
+
+      {/* QR Modal */}
+      {isQrModalOpen && qrDataUrl && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
+          onClick={() => setIsQrModalOpen(false)}
+        >
+          <div
+            className="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setIsQrModalOpen(false)}
+              className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full text-xl text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
+              aria-label="Tutup QR Code"
+            >
+              ×
+            </button>
+
+            <div className="text-center">
+              <h3 className="text-lg font-bold text-[#0D5C3A]">
+                QR Code Presensi
+              </h3>
+
+              {selectedEvent && (
+                <p className="mt-1 text-sm text-gray-500">
+                  {selectedEvent.event_title}
+                </p>
+              )}
+
+              <div className="mt-6 flex justify-center">
+                <div className="rounded-2xl border-2 border-[#D4AF37] bg-white p-4 shadow-md">
+                  <Image
+                    src={qrDataUrl}
+                    alt="QR Code Presensi"
+                    width={300}
+                    height={300}
+                    className="h-auto w-full max-w-[300px]"
+                    unoptimized
+                  />
+                </div>
+              </div>
+
+              {displayedQr && (
+                <p className="mt-5 text-sm text-gray-500">
+                  Berlaku sampai:{" "}
+                  <span className="font-semibold text-gray-700">
+                    {displayedQr.expired_at_wib || "-"}
+                  </span>
+                </p>
+              )}
+
+              <div className="mt-6 flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsQrModalOpen(false)}
+                  className="flex-1 rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-600 transition hover:bg-gray-50"
+                >
+                  Tutup
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!qrDataUrl || !selectedEvent) return;
+
+                    downloadDataUrl({
+                      dataUrl: qrDataUrl,
+                      fileName: `QR-${selectedEvent.event_title}`,
+                    });
+                  }}
+                  className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#0D5C3A] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0A4D30]"
+                >
+                  <Download size={16} />
+                  Unduh PNG
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {feedback && (
         <FeedbackToast type={feedback.type} message={feedback.message} />
