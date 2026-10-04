@@ -391,13 +391,19 @@ export default function SettingsPage() {
 														const allowedTypes = ["image/jpeg", "image/png"];
 
 														if (!allowedTypes.includes(file.type)) {
-															alert("Format file harus JPG, JPEG, atau PNG.");
+															setProfilePopup({
+																type: "error",
+																message: "Format file harus JPG, JPEG, atau PNG.",
+															});
 															e.target.value = "";
 															return;
 														}
 
 														if (file.size > 2 * 1024 * 1024) {
-															alert("Ukuran file maksimal 2 MB.");
+															setProfilePopup({
+																type: "error",
+																message: "Ukuran file maksimal 2 MB.",
+															});
 															e.target.value = "";
 															return;
 														}
