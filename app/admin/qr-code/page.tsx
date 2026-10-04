@@ -252,6 +252,8 @@ export default function GenerateQRPage() {
   const [generatedQr, setGeneratedQr] = useState<EventQrCode | null>(null);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [isGeneratingQrImage, setIsGeneratingQrImage] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const EVENTS_PER_PAGE = 4;
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
   const [feedback, setFeedback] = useState<{
     type: "success" | "error";
@@ -320,9 +322,23 @@ export default function GenerateQRPage() {
     };
   }, [qrPayload]);
 
-  const filteredEvents = useMemo(() => {
-    return events;
-  }, [events]);
+  const totalPages = Math.max(
+    1,
+    Math.ceil(events.length / EVENTS_PER_PAGE),
+  );
+
+  const paginatedEvents = useMemo(() => {
+    const startIndex = (currentPage - 1) * EVENTS_PER_PAGE;
+    const endIndex = startIndex + EVENTS_PER_PAGE;
+
+    return events.slice(startIndex, endIndex);
+  }, [events, currentPage]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
 
   const handleSelectEvent = (event: Event) => {
     setSelectedId(event.id);
@@ -749,7 +765,7 @@ export default function GenerateQRPage() {
               <AlertCircle size={36} className="mx-auto mb-2" />
               <p className="text-sm">Gagal memuat data event</p>
             </div>
-          ) : filteredEvents.length === 0 ? (
+          ) : events.length === 0 ? (
             <div className="md:col-span-2 xl:col-span-4 text-center py-8 text-[#0D5C3A]/40">
               <Icon3D variant="gray" size="lg">
                 <CalendarDays size={24} />
@@ -757,7 +773,7 @@ export default function GenerateQRPage() {
               <p className="text-sm mt-3">Belum ada event yang tersedia</p>
             </div>
           ) : (
-            filteredEvents.map((event) => (
+            paginatedEvents.map((event) => (
               <EventListCard
                 key={event.id}
                 event={event}
@@ -766,6 +782,36 @@ export default function GenerateQRPage() {
               />
             ))
           )}
+        </div>
+
+        <div className="mt-5 flex items-center justify-between border-t border-[#0D5C3A]/10 pt-4">
+          <p className="text-xs text-[#0D5C3A]/60">
+            Halaman {currentPage} dari {totalPages}
+          </p>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() =>
+                setCurrentPage((page) => Math.max(1, page - 1))
+              }
+              disabled={currentPage === 1}
+              className="rounded-lg border border-[#0D5C3A]/20 px-4 py-2 text-sm font-medium text-[#0D5C3A] transition hover:bg-[#E8F5E9] disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Sebelumnya
+            </button>
+
+            <button
+              type="button"
+              onClick={() =>
+                setCurrentPage((page) => Math.min(totalPages, page + 1))
+              }
+              disabled={currentPage === totalPages}
+              className="rounded-lg border border-[#0D5C3A]/20 px-4 py-2 text-sm font-medium text-[#0D5C3A] transition hover:bg-[#E8F5E9] disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Berikutnya
+            </button>
+          </div>
         </div>
       </div>
 
