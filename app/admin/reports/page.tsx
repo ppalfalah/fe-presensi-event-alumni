@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
+import { useMemo, useState, type FormEvent, type ReactNode } from "react";
 import {
   CalendarDays,
   ClipboardList,
@@ -8,10 +8,12 @@ import {
   FileText,
   Inbox,
   MapPin,
+  Search,
   TrendingUp,
   Users,
   X,
 } from "lucide-react";
+
 import AdminLayout from "@/app/components/AdminLayout";
 import FeedbackToast from "@/app/components/FeedbackToast";
 import { FormSelect } from "@/app/components/FormControl";
@@ -20,6 +22,7 @@ import type {
   AttendanceByDomicile,
 } from "@/hooks/admin/useAttendances";
 import { useReportsPage } from "./_hooks/useReportsPage";
+
 import {
   formatDate,
   formatDateTimeIndonesia,
@@ -40,8 +43,8 @@ function formatShortEventDate(dateStr?: string | null) {
   if (!dateStr) return "-";
 
   const date = new Date(dateStr);
-  if (Number.isNaN(date.getTime())) return "-";
 
+  if (Number.isNaN(date.getTime())) return "-";
   return new Intl.DateTimeFormat("id-ID", {
     day: "2-digit",
     month: "short",
@@ -133,6 +136,7 @@ function AngkatanBreakdownChart({
   expanded: boolean;
   onToggle: () => void;
 }) {
+
   if (items.length === 0) {
     return (
       <div className="flex h-[174px] items-center justify-center text-xs text-gray-400">
@@ -340,13 +344,14 @@ export default function ReportsPage() {
   const [eventPage, setEventPage] = useState(1);
   const [showAllDomiciles, setShowAllDomiciles] = useState(false);
   const [showAllCohorts, setShowAllCohorts] = useState(false);
-
+  const [attendanceSearch, setAttendanceSearch] = useState("");
   const EVENT_PER_PAGE = 5;
 
   const eventTotalPages = Math.max(
     1,
     Math.ceil(events.length / EVENT_PER_PAGE),
   );
+
   const safeEventPage = Math.min(eventPage, eventTotalPages);
 
   const paginatedEvents = useMemo(() => {
@@ -355,11 +360,37 @@ export default function ReportsPage() {
   }, [events, safeEventPage]);
 
   const openEventDetail = (eventId: number) => {
+    setAttendanceSearch("");
+    setAttendanceParams((previous) => ({
+      ...previous,
+      search: undefined,
+      page: 1,
+    }));
     setSelectedEventId(eventId);
     setShowAllDomiciles(false);
     setShowAllCohorts(false);
     setIsEventModalOpen(true);
   };
+
+  const handleAttendanceSearch = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const search = attendanceSearch.trim();
+    setAttendanceParams((previous) => ({
+      ...previous,
+      search: search || undefined,
+      page: 1,
+    }));
+  };
+
+  const handleClearAttendanceSearch = () => {
+    setAttendanceSearch("");
+    setAttendanceParams((previous) => ({
+      ...previous,
+      search: undefined,
+      page: 1,
+    }));
+  };
+
   const handleAttendanceSort = (column: AttendanceSortColumn) => {
     setAttendanceParams((previous) => ({
       ...previous,
@@ -371,10 +402,12 @@ export default function ReportsPage() {
       page: 1,
     }));
   };
+
   const getAttendanceSortIndicator = (column: AttendanceSortColumn) => {
     if (attendanceParams.sort_by !== column) return "↕";
     return attendanceParams.sort_dir === "desc" ? "↓" : "↑";
   };
+
   const handleAttendancePageChange = (page: number) => {
     setAttendanceParams((previous) => ({ ...previous, page }));
   };
@@ -385,6 +418,7 @@ export default function ReportsPage() {
 
   return (
     <AdminLayout title="Riwayat Kehadiran">
+
       {/* ── Stat Cards ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-5">
         {[
@@ -414,7 +448,7 @@ export default function ReportsPage() {
               loadingEvents
                 ? "..."
                 : `${avgRate}%`,
-            sub: "Rata-rata Kehadiran",
+            sub: "zata-rata Kehadiran",
             icon: (
               <Icon3D variant="green" size="md">
                 <TrendingUp size={20} strokeWidth={2.5} />
@@ -458,11 +492,16 @@ export default function ReportsPage() {
             value={selectedEventId ?? ""}
             onChange={(e) => {
               const eventId = Number(e.target.value) || null;
-              setSelectedEventId(eventId);
-
               if (eventId) {
-                setShowAllDomiciles(false);
-                setIsEventModalOpen(true);
+                openEventDetail(eventId);
+              } else {
+                setAttendanceSearch("");
+                setAttendanceParams((previous) => ({
+                  ...previous,
+                  search: undefined,
+                  page: 1,
+                }));
+                setSelectedEventId(null);
               }
             }}
             className="w-full appearance-none border border-gray-200 rounded-xl px-4 py-3 pr-10 text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#7AB2B2] focus:border-transparent cursor-pointer"
@@ -489,6 +528,7 @@ export default function ReportsPage() {
           <Icon3D variant="teal" size="md">
             <ClipboardList size={20} strokeWidth={2.5} />
           </Icon3D>
+
           <div>
             <h2 className="text-base font-bold text-[#0D5C3A] mb-1">
               Semua Event
@@ -509,6 +549,7 @@ export default function ReportsPage() {
                 <col className="w-[25%]" />
                 <col className="w-[15%]" />
               </colgroup>
+
               <thead className="bg-gradient-to-r from-[#E8F5E9] to-white">
                 <tr>
                   <th className="p-3 text-center font-semibold text-[#0D5C3A] rounded-l-xl">
@@ -533,6 +574,7 @@ export default function ReportsPage() {
                 {loadingEvents ? (
                   <TableSkeleton cols={5} />
                 ) : events.length === 0 ? (
+
                   <tr>
                     <td
                       colSpan={5}
@@ -544,7 +586,9 @@ export default function ReportsPage() {
                       <p className="mt-3">Belum ada data event</p>
                     </td>
                   </tr>
+
                 ) : (
+
                   paginatedEvents.map((e: ReportEvent) => {
                     const hadir = getHadir(e.id);
                     const rate = getRate(e.id, e.quota);
@@ -603,6 +647,7 @@ export default function ReportsPage() {
                                   ? "border-amber-200 bg-amber-50 text-amber-600"
                                   : "border-gray-200 bg-gray-50 text-gray-600"
                             }`}
+
                           >
                             {capitalizeStatus(e.status_event)}
                           </span>
@@ -639,6 +684,7 @@ export default function ReportsPage() {
             className="w-full max-w-6xl overflow-hidden rounded-2xl bg-white shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
+
             {/* Modal header */}
             <div className="flex flex-col gap-4 border-b border-gray-100 p-5 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0">
@@ -694,6 +740,7 @@ export default function ReportsPage() {
                     <Download size={13} strokeWidth={2.5} />
                     {exportingFormat === format ? "Menyiapkan..." : format}
                   </button>
+
                 ))}
 
                 <button
@@ -721,11 +768,14 @@ export default function ReportsPage() {
                   </div>
                   <div className="h-40 animate-pulse rounded-xl border border-gray-100 bg-gray-50" />
                 </div>
+
               ) : isAttendanceError ? (
+
                 <div className="flex min-h-64 flex-col items-center justify-center rounded-xl border border-red-100 bg-red-50/60 px-5 py-10 text-center">
                   <p className="text-sm font-bold text-red-700">
                     Data kehadiran gagal dimuat.
                   </p>
+
                   <p className="mt-1 max-w-lg text-xs text-red-600">
                     {attendanceErrorMessage}
                   </p>
@@ -740,6 +790,7 @@ export default function ReportsPage() {
                 </div>
               ) : (
                 <>
+
                   <div className="mb-4 grid grid-cols-1 gap-3 lg:grid-cols-2">
                     <section className="h-[252px] overflow-hidden rounded-xl border border-[#0D5C3A]/10 bg-[#0D5C3A]/[0.03] p-4">
                       <h3 className="text-sm font-bold text-[#0D5C3A]">
@@ -768,6 +819,47 @@ export default function ReportsPage() {
                     </section>
                   </div>
 
+                  {/* Search Attendance */}
+                  <form
+                    onSubmit={handleAttendanceSearch}
+                    className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center"
+                  >
+                    <div className="relative flex-1">
+                      <Search
+                        size={16}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                      />
+
+                      <input
+                        type="text"
+                        value={attendanceSearch}
+                        onChange={(e) => setAttendanceSearch(e.target.value)}
+                        placeholder="Cari nama, email, atau nomor HP..."
+                        className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-10 pr-10 text-sm text-gray-700 outline-none transition placeholder:text-gray-400 focus:border-[#2D7EA0] focus:ring-2 focus:ring-[#2D7EA0]/20"
+                      />
+
+                      {attendanceSearch && (
+                        <button
+                          type="button"
+                          onClick={handleClearAttendanceSearch}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 transition hover:text-gray-700"
+                          aria-label="Hapus pencarian"
+                        >
+                          <X size={16} />
+                        </button>
+                      )}
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={loadingAttendances}
+                      className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#0D5C3A] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0A4D30] disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      <Search size={15} />
+                      Cari
+                    </button>
+                  </form>
+
                   <div className="overflow-hidden rounded-xl border border-[#0D5C3A]/10">
                     <div className="w-full overflow-x-auto">
                       <table className="w-full min-w-[1180px] text-xs">
@@ -782,6 +874,7 @@ export default function ReportsPage() {
                         <th className="p-3 text-center font-semibold text-[#0D5C3A]">
                           No HP
                         </th>
+
                         <th className="p-0 text-center font-semibold text-[#0D5C3A]">
                           <button
                             type="button"
@@ -795,6 +888,7 @@ export default function ReportsPage() {
                             </span>
                           </button>
                         </th>
+
                         <th className="p-0 text-center font-semibold text-[#0D5C3A]">
                           <button
                             type="button"
@@ -829,7 +923,9 @@ export default function ReportsPage() {
                             colSpan={8}
                             className="py-10 text-center text-sm text-gray-400"
                           >
-                            Belum ada data kehadiran untuk event ini.
+                            {attendanceParams.search
+                              ? "Tidak ada data kehadiran yang cocok dengan pencarian."
+                              : "Belum ada data kehadiran untuk event ini."}
                           </td>
                         </tr>
                       ) : (
@@ -842,7 +938,6 @@ export default function ReportsPage() {
                           const normalizedStatus = String(status)
                             .toLowerCase()
                             .trim();
-
                           const statusClass =
                             normalizedStatus === "hadir"
                               ? "border-emerald-200 bg-emerald-50 text-emerald-600"
@@ -851,7 +946,6 @@ export default function ReportsPage() {
                                 : normalizedStatus === "tidak hadir"
                                   ? "border-red-200 bg-red-50 text-red-600"
                                   : "border-gray-200 bg-gray-50 text-gray-600";
-
                           return (
                             <tr
                               key={attendance.id ?? i}
@@ -914,6 +1008,7 @@ export default function ReportsPage() {
                     onPageChange={handleAttendancePageChange}
                   />
                 )}
+
                   </div>
                 </>
               )}
