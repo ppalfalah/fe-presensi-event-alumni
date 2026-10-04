@@ -238,16 +238,13 @@ export default function GenerateQRPage() {
         };
     }, [qrPayload]);
     const totalPages = Math.max(1, Math.ceil(events.length / EVENTS_PER_PAGE));
+    const safeCurrentPage = Math.min(currentPage, totalPages);
+
     const paginatedEvents = useMemo(() => {
-        const startIndex = (currentPage - 1) * EVENTS_PER_PAGE;
+        const startIndex = (safeCurrentPage - 1) * EVENTS_PER_PAGE;
         const endIndex = startIndex + EVENTS_PER_PAGE;
         return events.slice(startIndex, endIndex);
-    }, [events, currentPage]);
-    useEffect(() => {
-        if (currentPage > totalPages) {
-            setCurrentPage(totalPages);
-        }
-    }, [currentPage, totalPages]);
+    }, [events, safeCurrentPage]);
     const handleSelectEvent = (event: Event) => {
         setSelectedId(event.id);
         setGeneratedQr(null);
@@ -808,15 +805,15 @@ export default function GenerateQRPage() {
 
         {!loadingEvents && !eventsError && events.length > 0 && (<div className="mt-6 flex flex-col gap-3 border-t border-[#0D5C3A]/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-xs text-[#0D5C3A]/60">
-              Halaman {currentPage} dari {totalPages}
+              Halaman {safeCurrentPage} dari {totalPages}
             </p>
 
             <div className="flex items-center gap-2">
-              <button type="button" onClick={() => setCurrentPage((page) => Math.max(1, page - 1))} disabled={currentPage === 1} className="rounded-lg border border-[#0D5C3A]/20 px-4 py-2 text-sm font-medium text-[#0D5C3A] transition hover:bg-[#E8F5E9] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent">
+              <button type="button" onClick={() => setCurrentPage(Math.max(1, safeCurrentPage - 1))} disabled={safeCurrentPage === 1} className="rounded-lg border border-[#0D5C3A]/20 px-4 py-2 text-sm font-medium text-[#0D5C3A] transition hover:bg-[#E8F5E9] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent">
                 Sebelumnya
               </button>
 
-              <button type="button" onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))} disabled={currentPage === totalPages} className="rounded-lg border border-[#0D5C3A]/20 px-4 py-2 text-sm font-medium text-[#0D5C3A] transition hover:bg-[#E8F5E9] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent">
+              <button type="button" onClick={() => setCurrentPage(Math.min(totalPages, safeCurrentPage + 1))} disabled={safeCurrentPage === totalPages} className="rounded-lg border border-[#0D5C3A]/20 px-4 py-2 text-sm font-medium text-[#0D5C3A] transition hover:bg-[#E8F5E9] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent">
                 Berikutnya
               </button>
             </div>
@@ -824,42 +821,65 @@ export default function GenerateQRPage() {
       </div>
 
       <p className="mt-6 pb-6 text-center text-xs text-[#0D5C3A]/40">
+
         © 2026 Sistem Presensi Event - Pondok Pesantren Al-Qur&apos;an Al-Falah
+
       </p>
 
       {/* QR Modal */}
+
       {isQrModalOpen && qrDataUrl && (<div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm" onClick={() => setIsQrModalOpen(false)}>
 
           <div className="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+
             <button type="button" onClick={() => setIsQrModalOpen(false)} className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full text-xl text-gray-400 transition hover:bg-gray-100 hover:text-gray-700" aria-label="Tutup QR Code">
+
               ×
+
             </button>
 
             <div className="text-center">
+
               <h3 className="text-lg font-bold text-[#0D5C3A]">
+
                 QR Code Presensi
+
               </h3>
 
               {selectedEvent && (<p className="mt-1 text-sm text-gray-500">
+
                   {selectedEvent.event_title}
+
                 </p>)}
 
               <div className="mt-6 flex justify-center">
+
                 <div className="rounded-2xl border-2 border-[#D4AF37] bg-white p-4 shadow-md">
+
                   <Image src={qrDataUrl} alt="QR Code Presensi" width={300} height={300} className="h-auto w-full max-w-[300px]" unoptimized/>
+
                 </div>
+
               </div>
 
               {displayedQr && (<p className="mt-5 text-sm text-gray-500">
+
                   Berlaku sampai:{" "}
+
                   <span className="font-semibold text-gray-700">
+
                     {displayedQr.expired_at_wib || "-"}
+
                   </span>
+
                 </p>)}
 
               <div className="mt-6 flex gap-3">
+
                 <button type="button" onClick={() => setIsQrModalOpen(false)} className="flex-1 rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-600 transition hover:bg-gray-50">
+
                   Tutup
+
                 </button>
 
                 <button type="button" onClick={() => {
@@ -870,13 +890,23 @@ export default function GenerateQRPage() {
                     fileName: `QR-${selectedEvent.event_title}`,
                 });
             }} className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#0D5C3A] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0A4D30]">
+
                   <Download size={16}/>
+
                   Unduh PNG
+
                 </button>
+
               </div>
+
             </div>
+
           </div>
+
         </div>)}
+
       {feedback && (<FeedbackToast type={feedback.type} message={feedback.message}/>)}
+
     </AdminLayout>);
 }
+
