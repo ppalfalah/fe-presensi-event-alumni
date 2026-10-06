@@ -313,8 +313,10 @@ const FILTER_TABS: { key: FilterTab; label: string }[] = [
   { key: "read", label: "Sudah Dibaca" },
 ];
 
+
 export default function AlumniNotificationsPage() {
   const [activeFilter, setActiveFilter] = useState<FilterTab>("all");
+
   const {
     data: notifications = [],
     isLoading,
@@ -323,9 +325,24 @@ export default function AlumniNotificationsPage() {
     refetch,
     isFetching,
   } = useMyNotifications();
-  const { data: unreadCountData } = useUnreadCount();
+
+  const {
+    data: unreadCountData,
+    refetch: refetchUnreadCount,
+    isFetching: isFetchingUnreadCount,
+  } = useUnreadCount();
+
   const markAsRead = useMarkAsRead();
   const markAllAsRead = useMarkAllAsRead();
+
+  const handleRefresh = async () => {
+    await Promise.all([
+      refetch(),
+      refetchUnreadCount(),
+    ]);
+  };
+
+  const isRefreshing = isFetching || isFetchingUnreadCount;
 
   const readCount = notifications.filter(
     (notification) => notification.is_read === true
@@ -380,13 +397,15 @@ export default function AlumniNotificationsPage() {
 
           <button
             type="button"
-            onClick={() => refetch()}
-            disabled={isFetching}
+            onClick={handleRefresh}
+            disabled={isRefreshing}
             className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-gray-600 shadow-sm ring-1 ring-gray-100 transition-colors hover:bg-gray-50 disabled:opacity-60"
             aria-label="Muat ulang notifikasi"
           >
             <RefreshCw
-              className={`h-4.5 w-4.5 ${isFetching ? "animate-spin" : ""}`}
+              className={`h-4.5 w-4.5 ${
+                isRefreshing ? "animate-spin" : ""
+              }`}
             />
           </button>
         </div>
@@ -478,7 +497,7 @@ export default function AlumniNotificationsPage() {
           </p>
           <button
             type="button"
-            onClick={() => refetch()}
+            onClick={handleRefresh}
             className="mt-4 rounded-xl bg-teal-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-teal-700"
           >
             Coba lagi
