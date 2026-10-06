@@ -258,11 +258,16 @@ export default function ScanPage() {
     useState<CameraFacing>("unknown");
   const [cameraPermission, setCameraPermission] =
     useState<CameraPermissionState>("unknown");
+
   const [manualToken, setManualToken] = useState("");
+  const [manualError, setManualError] = useState("");
 
-  const { mutate: scanQr, isPending: isScanPending } = useScanQR();
+  const {
+    mutate: scanQr,
+    isPending: isScanPending,
+  } = useScanQR();
+
   const scanQrRef = useRef(scanQr);
-
   useEffect(() => {
     scanQrRef.current = scanQr;
   }, [scanQr]);
@@ -638,16 +643,17 @@ export default function ScanPage() {
   }, [clearScanner, stopScanner]);
 
   const resetScanner = async () => {
-    await stopAndClearScanner();
+    await stopScanner();
+    await clearScanner();
 
+    scannerRef.current = null;
     isProcessingRef.current = false;
 
     setStatus("idle");
     setCameraReady(false);
-    setCameraFacing("unknown");
-    setIsCameraStarting(false);
     setMessage("Arahkan kamera ke QR Code event untuk melakukan presensi");
     setManualToken("");
+    setManualError("");
   };
 
   const handleRetryCamera = async () => {
@@ -681,8 +687,14 @@ export default function ScanPage() {
   };
 
   const handleManualSubmit = async () => {
-    if (!manualToken.trim() || isProcessingRef.current) return;
+    if (isProcessingRef.current) return;
 
+    if (!manualToken.trim()) {
+      setManualError("Kode presensi wajib diisi.");
+      return;
+    }
+
+    setManualError("");
     isProcessingRef.current = true;
     setMessage("Memproses presensi manual...");
     await stopScanner();
@@ -988,27 +1000,50 @@ export default function ScanPage() {
             dapat membaca QR Code.
           </p>
 
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={manualToken}
-              onChange={(e) => setManualToken(e.target.value)}
-              placeholder="Masukkan kode presensi..."
-              className="flex-1 bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:border-[#41A07E] focus:ring-1 focus:ring-[#41A07E] transition-colors"
-              disabled={isScanPending}
-            />
+          <div>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={manualToken}
+                onChange={(e) => {
+                  setManualToken(e.target.value);
 
-            <button
-              onClick={handleManualSubmit}
-              disabled={!manualToken.trim() || isScanPending}
-              className="bg-[#41A07E] hover:bg-[#357f65] text-white px-5 py-2.5 rounded-xl font-medium text-sm shadow-md shadow-[#B2DE96]/30 transition-colors active:scale-[0.98] flex items-center justify-center min-w-[80px]"
-            >
-              {isScanPending ? (
-                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              ) : (
-                "Kirim"
-              )}
-            </button>
+                  if (manualError) {
+                    setManualError("");
+                  }
+                }}
+                placeholder="Masukkan kode presensi..."
+                aria-invalid={Boolean(manualError)}
+                aria-describedby={manualError ? "manual-code-error" : undefined}
+                className={`flex-1 bg-gray-50 border text-gray-700 text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 transition-colors ${
+                  manualError
+                    ? "border-red-400 focus:border-red-400 focus:ring-red-400"
+                    : "border-gray-200 focus:border-[#41A07E] focus:ring-[#41A07E]"
+                }`}
+                disabled={isScanPending}
+              />
+
+              <button
+                onClick={handleManualSubmit}
+                disabled={isScanPending}
+                className="bg-[#41A07E] hover:bg-[#357f65] disabled:opacity-60 text-white px-5 py-2.5 rounded-xl font-medium text-sm shadow-md shadow-[#B2DE96]/30 transition-colors active:scale-[0.98] flex items-center justify-center min-w-[80px]"
+              >
+                {isScanPending ? (
+                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  "Kirim"
+                )}
+              </button>
+            </div>
+
+            {manualError && (
+              <p
+                id="manual-code-error"
+                className="mt-2 text-xs font-medium text-red-500"
+              >
+                {manualError}
+              </p>
+            )}
           </div>
         </section>
       )}
