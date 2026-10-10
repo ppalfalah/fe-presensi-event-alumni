@@ -19,8 +19,8 @@ function formatEventDate(event: Event | null) {
   if (Number.isNaN(date.getTime())) return "-";
 
   return date.toLocaleDateString("id-ID", {
-    day: "2-digit",
-    month: "long",
+    day: "numeric",
+    month: "short",
     year: "numeric",
   });
 }

@@ -19,6 +19,7 @@ import {
   type EngagementMappingItem,
   useEngagementMapping,
 } from "@/hooks/admin/useEngagementMapping";
+import { formatDomicileName } from "@/lib/formatters";
 import {
   ENGAGEMENT_SEGMENTS,
   clampEngagementPercentage,
@@ -77,7 +78,7 @@ function getUserName(item: EngagementMappingItem) {
 }
 
 function getDomicileText(item: EngagementMappingItem) {
-  const city = item.user.domicile?.city?.name;
+  const city = formatDomicileName(item.user.domicile?.city?.name);
   const province = item.user.domicile?.province?.name;
 
   return [city, province].filter(Boolean).join(", ") || "-";

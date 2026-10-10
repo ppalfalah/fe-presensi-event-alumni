@@ -23,7 +23,7 @@ function formatDate(dateStr?: string) {
   try {
     return new Intl.DateTimeFormat("id-ID", {
       day: "numeric",
-      month: "long",
+      month: "short",
       year: "numeric",
       timeZone: "Asia/Jakarta",
     }).format(new Date(dateStr));
@@ -47,7 +47,7 @@ function formatScannedAt(dateStr?: string) {
     const d = new Date(dateStr);
     const formattedDate = d.toLocaleDateString("id-ID", {
       day: "numeric",
-      month: "long",
+      month: "short",
       year: "numeric",
     });
     const formattedTime = d.toLocaleTimeString("id-ID", {

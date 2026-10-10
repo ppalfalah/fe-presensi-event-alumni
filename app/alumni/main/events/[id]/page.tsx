@@ -28,7 +28,7 @@ function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString("id-ID", {
     weekday: "long",
     day: "numeric",
-    month: "long",
+    month: "short",
     year: "numeric",
   });
 }

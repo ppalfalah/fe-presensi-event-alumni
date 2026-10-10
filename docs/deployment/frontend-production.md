@@ -18,7 +18,7 @@ Buat di GitHub repo: `Settings` -> `Secrets and variables` -> `Actions` -> `New 
 
 | Secret | Contoh nilai | Keterangan |
 | --- | --- | --- |
-| `VPS_HOST` | `103.235.72.87` | IP VPS. |
+| `VPS_HOST` | `IP_VPS_ANDA` | IP VPS. |
 | `VPS_PORT` | `22` | Port SSH. |
 | `VPS_USER` | `deploy` | User deploy khusus, bukan root. |
 | `VPS_SSH_KEY` | isi private key | Private key SSH untuk user deploy. |
@@ -135,9 +135,9 @@ Di Cloudflare DNS:
 
 | Type | Name | Content | Proxy |
 | --- | --- | --- | --- |
-| A | `@` | `103.235.72.87` | Proxied |
+| A | `@` | `IP_VPS_ANDA` | Proxied |
 | CNAME | `www` | `ppalfalah.id` | Proxied |
-| A | `api` | `103.235.72.87` | Proxied atau DNS only |
+| A | `api` | `IP_VPS_ANDA` | Proxied atau DNS only |
 
 SSL/TLS: gunakan `Full (strict)` jika origin sudah punya sertifikat valid. Jika belum, buat Cloudflare Origin Certificate atau pasang Let's Encrypt di VPS.
 

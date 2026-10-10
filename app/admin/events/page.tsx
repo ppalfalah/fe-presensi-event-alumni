@@ -210,7 +210,7 @@ function formatDateTimeIndonesia(value?: string | null) {
 
   const datePart = date.toLocaleDateString("id-ID", {
     day: "numeric",
-    month: "long",
+    month: "short",
     year: "numeric",
   });
   const timeParts = new Intl.DateTimeFormat("id-ID", {

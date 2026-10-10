@@ -14,7 +14,7 @@ export default function UpcomingEvents() {
     {
       id: 2,
       title: "Gathering Alumni 2026",
-      date: "5 Juni 2026",
+      date: "5 Jun 2026",
       location: "Gedung Serbaguna",
     },
   ];

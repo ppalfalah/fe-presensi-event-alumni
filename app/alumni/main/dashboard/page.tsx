@@ -50,7 +50,7 @@ function formatDate(datetime?: string) {
 
   return new Date(datetime).toLocaleDateString("id-ID", {
     day: "numeric",
-    month: "long",
+    month: "short",
     year: "numeric",
   });
 }
@@ -70,7 +70,7 @@ function formatShort(datetime: string) {
   const d = new Date(datetime);
 
   return `${d.getDate()} ${d.toLocaleString("id-ID", {
-    month: "long",
+    month: "short",
   })} • ${d.toLocaleTimeString("id-ID", {
     hour: "2-digit",
     minute: "2-digit",
@@ -442,7 +442,7 @@ export default function AlumniDashboard() {
                   </p>
 
                   <p className="text-xs text-gray-400 mt-0.5">
-                    {new Date(presence.scanned_at).toLocaleDateString("id-ID")}
+                    {formatDate(presence.scanned_at)}
                   </p>
                 </div>
 

@@ -109,7 +109,7 @@ export default function Home() {
       return date.toLocaleDateString("id-ID", {
         weekday: "long",
         year: "numeric",
-        month: "long",
+        month: "short",
         day: "numeric",
       });
     } catch {

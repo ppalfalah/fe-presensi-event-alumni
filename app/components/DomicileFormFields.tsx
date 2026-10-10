@@ -9,6 +9,7 @@ import {
   useVillages,
 } from "@/hooks/useRegions";
 import { Loader2 } from "lucide-react";
+import { formatDomicileName } from "@/lib/formatters";
 
 export interface DomicileFormValues {
   domicile_province_code?: string | null;
@@ -151,7 +152,7 @@ export default function DomicileFormFields({
             </option>
             {cities.map((city) => (
               <option key={city.code} value={city.code}>
-                {city.name}
+                {formatDomicileName(city.name)}
               </option>
             ))}
           </FormSelect>

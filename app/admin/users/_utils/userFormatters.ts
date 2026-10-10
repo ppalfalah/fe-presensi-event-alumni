@@ -1,4 +1,5 @@
 import type { User } from "@/hooks/admin/users";
+import { formatDomicileName } from "@/lib/formatters";
 
 export function formatDate(dateStr?: string) {
 	if (!dateStr) return "-";
@@ -7,7 +8,7 @@ export function formatDate(dateStr?: string) {
 	if (Number.isNaN(date.getTime())) return "-";
 
 	return date.toLocaleDateString("id-ID", {
-		day: "2-digit",
+		day: "numeric",
 		month: "short",
 		year: "numeric",
 	});
@@ -78,7 +79,8 @@ export function formatDomicile(
 	fallback = "-",
 ) {
 	if (!cityName || cityName === "Tidak diketahui") return fallback;
-	return provinceName ? `${cityName}, ${provinceName}` : cityName;
+	const formattedCity = formatDomicileName(cityName);
+	return provinceName ? `${formattedCity}, ${provinceName}` : formattedCity;
 }
 
 function getExportRows(users: User[]) {
@@ -101,8 +103,8 @@ function getExportRows(users: User[]) {
 
 function getExportDate() {
 	return new Date().toLocaleDateString("id-ID", {
-		day: "2-digit",
-		month: "long",
+		day: "numeric",
+		month: "short",
 		year: "numeric",
 	});
 }

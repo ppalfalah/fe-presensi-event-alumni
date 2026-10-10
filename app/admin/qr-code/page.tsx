@@ -90,8 +90,8 @@ function formatEventDate(event: Event) {
     if (Number.isNaN(d.getTime()))
         return "-";
     return d.toLocaleDateString("id-ID", {
-        day: "2-digit",
-        month: "long",
+        day: "numeric",
+        month: "short",
         year: "numeric",
     });
 }

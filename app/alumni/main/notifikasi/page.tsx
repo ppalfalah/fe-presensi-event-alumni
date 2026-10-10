@@ -33,7 +33,7 @@ function formatDateTime(value?: string) {
 
   return date.toLocaleString("id-ID", {
     day: "numeric",
-    month: "long",
+    month: "short",
     year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
@@ -48,7 +48,7 @@ function formatDate(value?: string) {
 
   return date.toLocaleDateString("id-ID", {
     day: "numeric",
-    month: "long",
+    month: "short",
     year: "numeric",
   });
 }

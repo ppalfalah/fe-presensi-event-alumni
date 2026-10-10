@@ -3,6 +3,7 @@ import type {
 	AttendanceEvent,
 	AttendanceResponseData,
 } from "@/hooks/admin/useAttendances";
+import { formatDomicileName } from "@/lib/formatters";
 
 export interface ReportEvent {
 	id: number;
@@ -40,8 +41,8 @@ export function formatDate(dateValue?: string | null) {
 	if (Number.isNaN(d.getTime())) return "-";
 
 	return d.toLocaleDateString("id-ID", {
-		day: "2-digit",
-		month: "long",
+		day: "numeric",
+		month: "short",
 		year: "numeric",
 	});
 }
@@ -68,7 +69,7 @@ export function formatDateTimeIndonesia(dateValue?: string | null) {
 
 	const datePart = d.toLocaleDateString("id-ID", {
 		day: "numeric",
-		month: "long",
+		month: "short",
 		year: "numeric",
 	});
 	const timeParts = new Intl.DateTimeFormat("id-ID", {
@@ -98,7 +99,8 @@ export function formatDomicile(
 ) {
 	if (!cityName || cityName === "Tidak diketahui") return fallback;
 
-	return provinceName ? `${cityName}, ${provinceName}` : cityName;
+	const formattedCity = formatDomicileName(cityName);
+	return provinceName ? `${formattedCity}, ${provinceName}` : formattedCity;
 }
 
 export function getUserName(attendance: Attendance) {
@@ -146,8 +148,8 @@ function escapeExportValue(value: unknown) {
 
 function getExportDate() {
 	return new Date().toLocaleDateString("id-ID", {
-		day: "2-digit",
-		month: "long",
+		day: "numeric",
+		month: "short",
 		year: "numeric",
 	});
 }

@@ -12,7 +12,7 @@ function formatDate(dateStr?: string) {
 
   return new Date(dateStr).toLocaleDateString("id-ID", {
     day: "numeric",
-    month: "long",
+    month: "short",
     year: "numeric",
   });
 }

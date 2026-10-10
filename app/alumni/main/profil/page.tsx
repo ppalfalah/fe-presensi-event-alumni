@@ -22,6 +22,7 @@ import {
 import ConfirmDialog from "@/app/components/ConfirmDialog";
 import FeedbackToast from "@/app/components/FeedbackToast";
 import { FormInput, FormSelect } from "@/app/components/FormControl";
+import { formatDomicileName } from "@/lib/formatters";
 
 import {
   useProfile,
@@ -372,7 +373,7 @@ export default function AlumniProfilePage() {
 
     return new Intl.DateTimeFormat("id-ID", {
       day: "numeric",
-      month: "long",
+      month: "short",
       year: "numeric",
     }).format(new Date(dateStr));
   }
@@ -615,7 +616,7 @@ export default function AlumniProfilePage() {
                 <InfoRow
                   icon={MapPin}
                   label="Wilayah"
-                  value={`${profile.domicile.village?.name || ""}, ${profile.domicile.district?.name || ""}, ${profile.domicile.city?.name || ""}, ${profile.domicile.province?.name || ""}`}
+                  value={`${profile.domicile.village?.name || ""}, ${profile.domicile.district?.name || ""}, ${formatDomicileName(profile.domicile.city?.name)}, ${profile.domicile.province?.name || ""}`}
                 />
                 <InfoRow
                   icon={MapPin}
@@ -683,7 +684,7 @@ export default function AlumniProfilePage() {
         Bergabung sejak{" "}
         {profile.created_at
           ? new Intl.DateTimeFormat("id-ID", {
-              month: "long",
+              month: "short",
               year: "numeric",
             }).format(new Date(profile.created_at))
           : "—"}

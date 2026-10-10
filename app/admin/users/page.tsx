@@ -24,6 +24,7 @@ import FeedbackToast from "@/app/components/FeedbackToast";
 import { FormInput, FormSelect } from "@/app/components/FormControl";
 import SearchInput from "@/app/components/SearchInput";
 import DomicileFormFields from "@/app/components/DomicileFormFields";
+import { formatDomicileName } from "@/lib/formatters";
 import {
   useProvinces,
   useCities,
@@ -454,7 +455,7 @@ function formatHistoryDate(date?: string) {
   try {
     return new Date(date).toLocaleDateString("id-ID", {
       day: "numeric",
-      month: "long",
+      month: "short",
       year: "numeric",
     });
   } catch {
@@ -473,7 +474,7 @@ function formatHistoryScannedAt(date?: string) {
     const value = new Date(date);
     const formattedDate = value.toLocaleDateString("id-ID", {
       day: "numeric",
-      month: "long",
+      month: "short",
       year: "numeric",
     });
     const formattedTime = value.toLocaleTimeString("id-ID", {
@@ -502,7 +503,7 @@ function exportPresencesToCsv(userName: string, presences: PresenceRecord[]) {
     String(i + 1),
     `"${(p.event?.event_title || "-").replace(/"/g, '""')}"`,
     p.event?.event_date
-      ? new Date(p.event.event_date).toLocaleDateString("id-ID")
+      ? formatHistoryDate(p.event.event_date)
       : "-",
     formatHistoryTime(p.event?.start_time) || "-",
     formatHistoryTime(p.event?.end_time) || "-",
@@ -584,7 +585,7 @@ function UserPresenceHistoryModal({
             <span className="font-semibold text-gray-800">Domisili: </span>
             {user.domicile.address || "—"}, {user.domicile.village?.name || ""},{" "}
             {user.domicile.district?.name || ""},{" "}
-            {user.domicile.city?.name || ""},{" "}
+            {formatDomicileName(user.domicile.city?.name)},{" "}
             {user.domicile.province?.name || ""} (Kode Pos:{" "}
             {user.domicile.postal_code || "—"})
           </div>
@@ -956,7 +957,7 @@ export default function UsersPage() {
                 <option value="">Semua Kota/Kabupaten</option>
                 {cities.map((c) => (
                   <option key={c.code} value={c.code}>
-                    {c.name}
+                    {formatDomicileName(c.name)}
                   </option>
                 ))}
               </FormSelect>
@@ -1220,7 +1221,7 @@ export default function UsersPage() {
                                       size={8}
                                       className="text-[#0D5C3A]/40 shrink-0"
                                     />
-                                    {user.domicile.city.name},{" "}
+                                    {formatDomicileName(user.domicile.city.name)},{" "}
                                     {user.domicile.province?.name}
                                   </span>
                                 )}
